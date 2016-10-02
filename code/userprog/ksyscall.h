@@ -2,19 +2,23 @@
  *
  * userprog/ksyscall.h
  *
- * Kernel interface for systemcalls 
+ * Kernel interface for systemcalls
  *
  * by Marcus Voelp  (c) Universitaet Karlsruhe
  *
  **************************************************************/
 
-#ifndef __USERPROG_KSYSCALL_H__ 
-#define __USERPROG_KSYSCALL_H__ 
+#ifndef __USERPROG_KSYSCALL_H__
+#define __USERPROG_KSYSCALL_H__
 
 #include "kernel.h"
 
 #include "synchconsole.h"
 
+void SysPrintInt(int n)
+{
+    kernel->interrupt->PrintInt(n);
+}
 
 void SysHalt()
 {

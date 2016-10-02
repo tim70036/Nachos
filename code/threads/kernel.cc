@@ -1,8 +1,8 @@
-// kernel.cc 
+// kernel.cc
 //	Initialization and cleanup routines for the Nachos kernel.
 //
 // Copyright (c) 1992-1996 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
+// All rights reserved.  See copyright.h for copyright notice and limitation
 // of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
@@ -20,13 +20,13 @@
 
 //----------------------------------------------------------------------
 // Kernel::Kernel
-// 	Interpret command line arguments in order to determine flags 
-//	for the initialization (see also comments in main.cc)  
+// 	Interpret command line arguments in order to determine flags
+//	for the initialization (see also comments in main.cc)
 //----------------------------------------------------------------------
 
 Kernel::Kernel(int argc, char **argv)
 {
-    randomSlice = FALSE; 
+    randomSlice = FALSE;
     debugUserProg = FALSE;
     consoleIn = NULL;          // default is stdin
     consoleOut = NULL;         // default is stdout
@@ -82,7 +82,7 @@ Kernel::Kernel(int argc, char **argv)
 
 //----------------------------------------------------------------------
 // Kernel::Initialize
-// 	Initialize Nachos global data structures.  Separate from the 
+// 	Initialize Nachos global data structures.  Separate from the
 //	constructor because some of these refer to earlier initialized
 //	data via the "kernel" global variable.
 //----------------------------------------------------------------------
@@ -92,10 +92,10 @@ Kernel::Initialize()
 {
     // We didn't explicitly allocate the current thread we are running in.
     // But if it ever tries to give up the CPU, we better have a Thread
-    // object to save its state. 
+    // object to save its state.
 
-	
-    currentThread = new Thread("main", threadNum++);		
+
+    currentThread = new Thread("main", threadNum++);
     currentThread->setStatus(RUNNING);
 
     stats = new Statistics();		// collect statistics
@@ -135,7 +135,7 @@ Kernel::~Kernel()
     delete fileSystem;
     delete postOfficeIn;
     delete postOfficeOut;
-    
+
     Exit(0);
 }
 
@@ -148,16 +148,16 @@ void
 Kernel::ThreadSelfTest() {
    Semaphore *semaphore;
    SynchList<int> *synchList;
-   
+
    LibSelfTest();		// test library routines
-   
+
    currentThread->SelfTest();	// test thread switching
-   
+
    				// test semaphore operation
    semaphore = new Semaphore("test", 0);
    semaphore->SelfTest();
    delete semaphore;
-   
+
    				// test locks, condition variables
 				// using synchronized lists
    synchList = new SynchList<int>;
@@ -175,7 +175,7 @@ void
 Kernel::ConsoleTest() {
     char ch;
 
-    cout << "Testing the console device.\n" 
+    cout << "Testing the console device.\n"
         << "Typed characters will be echoed, until ^D is typed.\n"
         << "Note newlines are needed to flush input through UNIX.\n";
     cout.flush();
@@ -196,7 +196,7 @@ Kernel::ConsoleTest() {
 //      1. send a message to the other machine at mail box #0
 //      2. wait for the other machine's message to arrive (in our mailbox #0)
 //      3. send an acknowledgment for the other machine's message
-//      4. wait for an acknowledgement from the other machine to our 
+//      4. wait for an acknowledgement from the other machine to our
 //          original message
 //
 //  This test works best if each Nachos machine has its own window
@@ -207,7 +207,7 @@ Kernel::NetworkTest() {
 
     if (hostName == 0 || hostName == 1) {
         // if we're machine 1, send to 0 and vice versa
-        int farHost = (hostName == 0 ? 1 : 0); 
+        int farHost = (hostName == 0 ? 1 : 0);
         PacketHeader outPktHdr, inPktHdr;
         MailHeader outMailHdr, inMailHdr;
         char *data = "Hello there!";
@@ -217,17 +217,17 @@ Kernel::NetworkTest() {
         // construct packet, mail header for original message
         // To: destination machine, mailbox 0
         // From: our machine, reply to: mailbox 1
-        outPktHdr.to = farHost;         
+        outPktHdr.to = farHost;
         outMailHdr.to = 0;
         outMailHdr.from = 1;
         outMailHdr.length = strlen(data) + 1;
 
         // Send the first message
-        postOfficeOut->Send(outPktHdr, outMailHdr, data); 
+        postOfficeOut->Send(outPktHdr, outMailHdr, data);
 
         // Wait for the first message from the other machine
         postOfficeIn->Receive(0, &inPktHdr, &inMailHdr, buffer);
-        cout << "Got: " << buffer << " : from " << inPktHdr.from << ", box " 
+        cout << "Got: " << buffer << " : from " << inPktHdr.from << ", box "
                                                 << inMailHdr.from << "\n";
         cout.flush();
 
@@ -236,11 +236,11 @@ Kernel::NetworkTest() {
         outPktHdr.to = inPktHdr.from;
         outMailHdr.to = inMailHdr.from;
         outMailHdr.length = strlen(ack) + 1;
-        postOfficeOut->Send(outPktHdr, outMailHdr, ack); 
+        postOfficeOut->Send(outPktHdr, outMailHdr, ack);
 
         // Wait for the ack from the other machine to the first message we sent
 	postOfficeIn->Receive(1, &inPktHdr, &inMailHdr, buffer);
-        cout << "Got: " << buffer << " : from " << inPktHdr.from << ", box " 
+        cout << "Got: " << buffer << " : from " << inPktHdr.from << ", box "
                                                 << inMailHdr.from << "\n";
         cout.flush();
     }
@@ -253,7 +253,7 @@ void ForkExecute(Thread *t)
 	if ( !t->space->Load(t->getName()) ) {
     	return;             // executable not found
     }
-	
+
     t->space->Execute(t->getName());
 
 }
@@ -264,7 +264,7 @@ void Kernel::ExecAll()
 		int a = Exec(execfile[i]);
 	}
 	currentThread->Finish();
-    //Kernel::Exec();	
+    //Kernel::Exec();
 }
 
 
@@ -284,7 +284,7 @@ int Kernel::Exec(char* name)
 		t[n]->Fork((VoidFunctionPtr) &ForkExecute, (void *)t[n]);
 		cout << "Thread " << execfile[n] << " is executing." << endl;
 	}
-	cout << "debug Kernel::Run finished.\n";	
+	cout << "debug Kernel::Run finished.\n";
 */
 //  Thread *t1 = new Thread(execfile[1]);
 //  Thread *t1 = new Thread("../test/test1");
@@ -309,3 +309,8 @@ int Kernel::CreateFile(char *filename)
 }
 
 
+/* MP1 */
+void Kernel::PrintInt(int n)
+{
+    synchConsoleOut->PutChar((char)(n+48));
+}
