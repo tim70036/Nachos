@@ -118,6 +118,9 @@ class Interrupt {
 
     void OneTick();       	// Advance simulated time
 
+	/* MP1 */
+	void PrintInt(int n);
+
   private:
     IntStatus level;		// are interrupts enabled or disabled?
     SortedList<PendingInterrupt *> *pending;
@@ -140,8 +143,7 @@ class Interrupt {
     void ChangeLevel(IntStatus old, 	// SetLevel, without advancing the
 			IntStatus now); // simulated time
 
-	/* MP1 */
-	void PrintInt(int n);
+
 };
 
 #endif // INTERRRUPT_H
