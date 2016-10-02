@@ -313,4 +313,5 @@ int Kernel::CreateFile(char *filename)
 void Kernel::PrintInt(int n)
 {
     synchConsoleOut->PutChar((char)(n+48));
+    synchConsoleOut->PutChar('\n');
 }

@@ -58,6 +58,7 @@ ExceptionHandler(ExceptionType which)
     switch (which) {
     case SyscallException:
       	switch(type) {
+            
         /* MP1 */
         case SC_PrintInt:
             DEBUG(dbgSys, "Fuck You\n");

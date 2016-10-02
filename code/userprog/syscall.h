@@ -38,7 +38,7 @@
 #define SC_MSG		100
 
 /* MP1 */
-#define SC_PrintInt 87
+#define SC_PrintInt   87
 
 #ifndef IN_ASM
 
