@@ -15,7 +15,7 @@
 #include "interrupt.h"
 #include "synchconsole.h"
 
-OpenFile* Open(char *filename)
+int Open(char *filename)
 {
     return kernel->interrupt->Open(filename);
 }

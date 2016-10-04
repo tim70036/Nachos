@@ -48,7 +48,7 @@ class Kernel {
 
     /* MP1 */
     void PrintInt(int n);
-    OpenFile* Open(char *filename);
+    int Open(char *filename);
 
 // These are public for notational convenience; really,
 // they're global variables used everywhere.
