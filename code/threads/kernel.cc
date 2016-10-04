@@ -312,7 +312,17 @@ int Kernel::CreateFile(char *filename)
 /* MP1 */
 void Kernel::PrintInt(int n)
 {
-    synchConsoleOut->PutChar((char)(n+48));
+    int remain = 0;
+    int index = 0;
+    char num[3000];
+    while(n > 0)
+    {
+        remain = n % 10;
+        n /= 10;
+        num[index++] = (char)(remain+48);
+    }
+    index--;
+    while(index >=0 ) synchConsoleOut->PutChar(num[index--]);
     synchConsoleOut->PutChar('\n');
 }
 
