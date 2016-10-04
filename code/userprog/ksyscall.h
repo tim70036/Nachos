@@ -15,6 +15,11 @@
 #include "interrupt.h"
 #include "synchconsole.h"
 
+int SysWrite(char* buffer , int size , int id)
+{
+    return kernel->interrupt->Write(buffer, size, id);
+}
+
 int SysOpen(char *filename)
 {
     return kernel->interrupt->Open(filename);

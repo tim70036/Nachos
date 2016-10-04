@@ -121,6 +121,7 @@ class Interrupt {
 	/* MP1 */
 	void PrintInt(int n);
 	int Open(char *filename);
+	int Write(char* buffer , int size , int id);
 
   private:
     IntStatus level;		// are interrupts enabled or disabled?

@@ -369,3 +369,8 @@ int Interrupt::Open(char *filename)
 {
 	return kernel->Open(filename);
 }
+
+int Interrupt::Write(char* buffer , int size , int id)
+{
+	return kernel->Write(buffer, size, id);
+}

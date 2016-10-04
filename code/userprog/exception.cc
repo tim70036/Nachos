@@ -83,6 +83,22 @@ ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
             break;
 
+        case SC_Write:
+            int buffer = kernel->machine->ReadRegister(4);
+            int size = kernel->machine->ReadRegister(5);
+            int id = kernel->machine->ReadRegister(6);
+            {
+            char* cbuffer = &(kernel->machine->mainMemory[buffer]);
+            status = (int) SysWrite(cbuffer , size , id);
+            kernel->machine->WriteRegister(2, (int) status);
+            }
+            kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+            kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+            kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg)+4);
+            return;
+            ASSERTNOTREACHED();
+            break;
+
       	case SC_Halt:
 			DEBUG(dbgSys, "Shutdown, initiated by user program.\n");
 			SysHalt();

@@ -26,7 +26,7 @@
 #define SC_Remove       5
 
 #define SC_Read		7
-#define SC_Write	8
+
 #define SC_Seek         9
 #define SC_Close	10
 #define SC_ThreadFork	11
@@ -40,6 +40,7 @@
 /* MP1 */
 #define SC_PrintInt   87
 #define SC_Open 8787
+#define SC_Write 9487
 
 #ifndef IN_ASM
 
@@ -187,6 +188,7 @@ void ThreadExit(int ExitCode);
 /* MP1 */
 void PrintInt(int number);
 OpenFileId Open(char *name);
+int Write(char *buffer, int size, OpenFileId id);
 
 #endif /* IN_ASM */
 

@@ -315,12 +315,21 @@ void Kernel::PrintInt(int n)
     int remain = 0;
     int index = 0;
     char num[3000];
+
+    /* Check Negative ? */
+    int isNegative = (n > 0) ? 0 : 1;
+    if(isNegative) n *= -1;
+
     while(n > 0)
     {
         remain = n % 10;
         n /= 10;
         num[index++] = (char)(remain+48);
     }
+
+    /* Output '-' */
+    if(isNegative) synchConsoleOut->PutChar('-');
+
     index--;
     while(index >=0 ) synchConsoleOut->PutChar(num[index--]);
     synchConsoleOut->PutChar('\n');
@@ -328,5 +337,24 @@ void Kernel::PrintInt(int n)
 
 int Kernel::Open(char *filename)
 {
-    return (int)(fileSystem->Open(filename));
+    OpenFile* file = fileSystem->Open(filename);
+    if(file == NULL) return -1;
+    return (int)(file);
+}
+
+int Kernel::Write(char* buffer , int size , int id)
+{
+    OpenFile* file = (OpenFile*) id;
+    bool found = 0;
+    for(int i=0 ; i < fileSystem->openFileTableTop ; i++)
+    {
+        if(openFileTable[i] == file)
+        {
+            found = 1;
+            break;
+        }
+    }
+
+    if(found == 0)  return -1;
+    return file->Write(buffer, size);
 }
