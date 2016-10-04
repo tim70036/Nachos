@@ -42,7 +42,11 @@
 				// implementation is available
 class FileSystem {
   public:
-    FileSystem() { for (int i = 0; i < 20; i++) fileDescriptorTable[i] = NULL; }
+    FileSystem()
+    {
+        for (int i = 0; i < 20; i++) fileDescriptorTable[i] = NULL;
+        openFileTableTop = 0;
+    }
 
     bool Create(char *name) {
 	int fileDescriptor = OpenForWrite(name);
@@ -57,7 +61,7 @@ class FileSystem {
 
 	  if (fileDescriptor == -1) return NULL;
       if (openFileTableTop >= 487) return NULL;
-      
+
       OpenFile* opened = new OpenFile(fileDescriptor);
       openFileTable[openFileTableTop++] = opened;
 	  return opened;
@@ -68,7 +72,7 @@ class FileSystem {
 	OpenFile *fileDescriptorTable[20];
 
     OpenFile *openFileTable[487];
-    int openFileTableTop = 0;
+    int openFileTableTop;
 };
 
 #else // FILESYS
