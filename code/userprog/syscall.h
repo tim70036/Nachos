@@ -53,9 +53,7 @@
  * from the system call entry point in exception.cc.
  */
 
-/* MP1 */
-void PrintInt(int number);
-OpenFileId Open(char *name);
+
 
 /* Stop Nachos, and print out performance stats */
 void Halt();
@@ -184,6 +182,11 @@ int ThreadJoin(ThreadId id);
  * Deletes current thread and returns ExitCode to every waiting lokal thread.
  */
 void ThreadExit(int ExitCode);
+
+
+/* MP1 */
+void PrintInt(int number);
+OpenFileId Open(char *name);
 
 #endif /* IN_ASM */
 
