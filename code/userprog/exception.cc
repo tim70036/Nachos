@@ -84,10 +84,10 @@ ExceptionHandler(ExceptionType which)
             break;
 
         case SC_Write:
+            {
             int buffer = kernel->machine->ReadRegister(4);
             int size = kernel->machine->ReadRegister(5);
             int id = kernel->machine->ReadRegister(6);
-            {
             char* cbuffer = &(kernel->machine->mainMemory[buffer]);
             status = (int) SysWrite(cbuffer , size , id);
             kernel->machine->WriteRegister(2, (int) status);
