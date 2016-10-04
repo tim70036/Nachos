@@ -39,6 +39,7 @@
 
 /* MP1 */
 #define SC_PrintInt   87
+#define SC_Open 8787
 
 #ifndef IN_ASM
 
@@ -54,6 +55,7 @@
 
 /* MP1 */
 void PrintInt(int number);
+OpenFileId Open(char *name);
 
 /* Stop Nachos, and print out performance stats */
 void Halt();

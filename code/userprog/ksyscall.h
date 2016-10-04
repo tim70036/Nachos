@@ -15,6 +15,11 @@
 #include "interrupt.h"
 #include "synchconsole.h"
 
+OpenFile* Open(char *filename)
+{
+    return kernel->interrupt->Open(filename);
+}
+
 void SysPrintInt(int n)
 {
     kernel->interrupt->PrintInt(n);

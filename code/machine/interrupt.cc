@@ -364,3 +364,8 @@ void Interrupt::PrintInt(int n)
 {
 	kernel->PrintInt(n);
 }
+
+OpenFile* Open(char *filename)
+{
+	return kernel->Open(filename);
+}

@@ -58,11 +58,24 @@ ExceptionHandler(ExceptionType which)
     switch (which) {
     case SyscallException:
       	switch(type) {
-            
+
         /* MP1 */
         case SC_PrintInt:
-            DEBUG(dbgSys, "Fuck You\n");
             SysPrintInt((int)kernel->machine->ReadRegister(4));
+            kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+            kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+            kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg)+4);
+            return;
+			ASSERTNOTREACHED();
+            break;
+
+        case SC_Open:
+            val = kernel->machine->ReadRegister(4);
+            {
+            char *filename = &(kernel->machine->mainMemory[val]);
+            status = (int) SysOpen(filename);
+            kernel->machine->WriteRegister(2, (int) status);
+            }
             kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
             kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
             kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg)+4);

@@ -120,6 +120,7 @@ class Interrupt {
 
 	/* MP1 */
 	void PrintInt(int n);
+	OpenFile* Open(char *filename);
 
   private:
     IntStatus level;		// are interrupts enabled or disabled?
