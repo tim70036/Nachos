@@ -51,14 +51,6 @@ PrintInt:
     j	$31
     .end PrintInt
 
-    .globl Open
-    .ent Open
-Open:
-    addiu $2,$0,SC_Open
-    syscall
-    j	$31
-    .end Open
-
 	.globl Halt
 	.ent	Halt
 Halt:
