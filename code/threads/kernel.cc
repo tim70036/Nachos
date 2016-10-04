@@ -348,7 +348,7 @@ int Kernel::Write(char* buffer , int size , int id)
     bool found = 0;
     for(int i=0 ; i < fileSystem->openFileTableTop ; i++)
     {
-        if(openFileTable[i] == file)
+        if(fileSystem->openFileTable[i] == file)
         {
             found = 1;
             break;
