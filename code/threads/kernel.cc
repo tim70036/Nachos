@@ -316,7 +316,7 @@ void Kernel::PrintInt(int n)
     synchConsoleOut->PutChar('\n');
 }
 
-int Open(char *filename)
+int Kernel::Open(char *filename)
 {
     return (int)(fileSystem->Open(filename));
 }
