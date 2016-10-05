@@ -40,7 +40,7 @@
 #define SC_Open 8787
 #define SC_Write 9487
 #define SC_Read	 5487
-#define SC_Close    38763
+#define SC_Close    168
 
 #ifndef IN_ASM
 
