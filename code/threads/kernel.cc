@@ -397,6 +397,6 @@ int Kernel::Close(int id)
         }
     }
     if(found == false) return 0;
-
-    return fileSystem->Close(file) + 1;
+    delete file;
+    return 1;
 }

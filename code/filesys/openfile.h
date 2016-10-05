@@ -32,12 +32,10 @@ class OpenFile {
 
   public:
 
-      static int closeStatus = 0;
-
     OpenFile(int f) { file = f; currentOffset = 0; }	// open the file
     ~OpenFile()
     {
-        closeStatus = Close(file);
+        Close(file);
     }			// close the file
 
     int ReadAt(char *into, int numBytes, int position) {
