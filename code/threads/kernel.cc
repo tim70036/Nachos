@@ -399,5 +399,5 @@ int Kernel::Close(int id)
     if(found == false) return 0;
 
     delete file;
-    return OpenFile->closeStatus + 1;
+    return (OpenFile::closeStatus) + 1;
 }

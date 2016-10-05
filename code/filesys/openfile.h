@@ -29,10 +29,12 @@
 					// See definitions listed under #else
 class OpenFile {
 
-    static int closeStatus;
+
   public:
     OpenFile(int f) { file = f; currentOffset = 0; }	// open the file
     ~OpenFile() { closeStatus = Close(file); }			// close the file
+
+    static int closeStatus;
 
     int ReadAt(char *into, int numBytes, int position) {
     		Lseek(file, position, 0);
