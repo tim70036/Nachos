@@ -31,10 +31,14 @@ class OpenFile {
 
 
   public:
-    OpenFile(int f) { file = f; currentOffset = 0; }	// open the file
-    ~OpenFile() { closeStatus = Close(file); }			// close the file
 
-    static int closeStatus;
+      static int closeStatus = 0;
+
+    OpenFile(int f) { file = f; currentOffset = 0; }	// open the file
+    ~OpenFile()
+    {
+        closeStatus = Close(file);
+    }			// close the file
 
     int ReadAt(char *into, int numBytes, int position) {
     		Lseek(file, position, 0);

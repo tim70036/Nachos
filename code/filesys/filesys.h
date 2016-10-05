@@ -67,6 +67,12 @@ class FileSystem {
 	  return opened;
       }
 
+    int Close(OpenFile* file)
+    {
+        delete file;
+        return OpenFile::closeStatus;
+    }
+
     bool Remove(char *name) { return Unlink(name) == 0; }
 
 	OpenFile *fileDescriptorTable[20];
