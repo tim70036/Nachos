@@ -15,6 +15,16 @@
 #include "interrupt.h"
 #include "synchconsole.h"
 
+int SysClose(int id)
+{
+    return kernel->interrupt->Close(id);
+}
+
+int SysRead(char* buffer , int size , int id)
+{
+    return kernel->interrupt->Read(buffer, size, id);
+}
+
 int SysWrite(char* buffer , int size , int id)
 {
     return kernel->interrupt->Write(buffer, size, id);

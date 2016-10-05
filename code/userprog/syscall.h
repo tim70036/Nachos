@@ -25,10 +25,8 @@
 #define SC_Create	4
 #define SC_Remove       5
 
-#define SC_Read		7
-
 #define SC_Seek         9
-#define SC_Close	10
+
 #define SC_ThreadFork	11
 #define SC_ThreadYield	12
 #define SC_ExecV	13
@@ -41,6 +39,8 @@
 #define SC_PrintInt   87
 #define SC_Open 8787
 #define SC_Write 9487
+#define SC_Read	 5487
+#define SC_Close    38763
 
 #ifndef IN_ASM
 
@@ -135,7 +135,6 @@ OpenFileId Open(char *name);
  * Return the number of bytes actually read on success.
  * On failure, a negative error code is returned.
  */
-int Write(char *buffer, int size, OpenFileId id);
 
 /* Read "size" bytes from the open file into "buffer".
  * Return the number of bytes actually read -- if the open file isn't
@@ -143,7 +142,6 @@ int Write(char *buffer, int size, OpenFileId id);
  * characters to read, return whatever is available (for I/O devices,
  * you should always wait until you can return at least one character).
  */
-int Read(char *buffer, int size, OpenFileId id);
 
 /* Set the seek position of the open file "id"
  * to the byte "position".
@@ -153,7 +151,7 @@ int Seek(int position, OpenFileId id);
 /* Close the file, we're done reading and writing to it.
  * Return 1 on success, negative error code on failure
  */
-int Close(OpenFileId id);
+
 
 
 /* User-level thread operations: Fork and Yield.  To allow multiple
@@ -189,6 +187,8 @@ void ThreadExit(int ExitCode);
 void PrintInt(int number);
 OpenFileId Open(char *name);
 int Write(char *buffer, int size, OpenFileId id);
+int Read(char *buffer, int size, OpenFileId id);
+int Close(OpenFileId id);
 
 #endif /* IN_ASM */
 

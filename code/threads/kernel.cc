@@ -312,6 +312,12 @@ int Kernel::CreateFile(char *filename)
 /* MP1 */
 void Kernel::PrintInt(int n)
 {
+    if(n == 0)
+    {
+        synchConsoleOut->PutChar((char)(n+48));
+        return;
+    }
+
     int remain = 0;
     int index = 0;
     char num[3000];
@@ -345,16 +351,53 @@ int Kernel::Open(char *filename)
 int Kernel::Write(char* buffer , int size , int id)
 {
     OpenFile* file = (OpenFile*) id;
-    bool found = 0;
+    bool found = false;
     for(int i=0 ; i < fileSystem->openFileTableTop ; i++)
     {
         if(fileSystem->openFileTable[i] == file)
         {
-            found = 1;
+            found = true;
             break;
         }
     }
 
-    if(found == 0)  return -1;
+    if(found == false)  return -1;
     return file->Write(buffer, size);
+}
+
+int Kernel::Read(char* buffer , int size , int id)
+{
+    OpenFile* file = (OpenFile*) id;
+    bool found = false;
+    for(int i=0 ; i < fileSystem->openFileTableTop ; i++)
+    {
+        if(fileSystem->openFileTable[i] == file)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if(found == false)  return -1;
+    return file->Read(buffer, size);
+}
+
+int Kernel::Close(int id)
+{
+    OpenFile* file = (OpenFile*) id;
+    bool found = false;
+    for(int i=0 ; i < fileSystem->openFileTableTop ; i++)
+    {
+        if(fileSystem->openFileTable[i] == file)
+        {
+            found = true;
+            fileSystem->openFileTable[i] = fileSystem->openFileTable[fileSystem->openFileTableTop-1];
+            fileSystem->openFileTableTop--;
+            break;
+        }
+    }
+    if(found == false) return 0;
+
+    delete file;
+    return OpenFile->closeStatus + 1;
 }

@@ -50,6 +50,8 @@ class Kernel {
     void PrintInt(int n);
     int Open(char *filename);
     int Write(char* buffer , int size , int id);
+    int Read(char* buffer , int size , int id);
+    int Close(int id);
 
 // These are public for notational convenience; really,
 // they're global variables used everywhere.

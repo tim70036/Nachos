@@ -122,6 +122,8 @@ class Interrupt {
 	void PrintInt(int n);
 	int Open(char *filename);
 	int Write(char* buffer , int size , int id);
+	int Read(char* buffer , int size , int id);
+	int Close(int id);
 
   private:
     IntStatus level;		// are interrupts enabled or disabled?
