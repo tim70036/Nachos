@@ -351,52 +351,33 @@ int Kernel::Open(char *filename)
 int Kernel::Write(char* buffer , int size , int id)
 {
     OpenFile* file = (OpenFile*) id;
-    bool found = false;
     for(int i=0 ; i < fileSystem->openFileTableTop ; i++)
-    {
         if(fileSystem->openFileTable[i] == file)
-        {
-            found = true;
-            break;
-        }
-    }
-
-    if(found == false)  return -1;
-    return file->Write(buffer, size);
+            return file->Write(buffer, size);
+    return -1;
 }
 
 int Kernel::Read(char* buffer , int size , int id)
 {
     OpenFile* file = (OpenFile*) id;
-    bool found = false;
     for(int i=0 ; i < fileSystem->openFileTableTop ; i++)
-    {
         if(fileSystem->openFileTable[i] == file)
-        {
-            found = true;
-            break;
-        }
-    }
-
-    if(found == false)  return -1;
-    return file->Read(buffer, size);
+            return file->Read(buffer, size);
+    return -1;
 }
 
 int Kernel::Close(int id)
 {
     OpenFile* file = (OpenFile*) id;
-    bool found = false;
     for(int i=0 ; i < fileSystem->openFileTableTop ; i++)
     {
         if(fileSystem->openFileTable[i] == file)
         {
-            found = true;
             fileSystem->openFileTable[i] = fileSystem->openFileTable[fileSystem->openFileTableTop-1];
             fileSystem->openFileTableTop--;
-            break;
+            delete file;
+            return 1;
         }
     }
-    if(found == false) return 0;
-    delete file;
-    return 1;
+    return 0;
 }
