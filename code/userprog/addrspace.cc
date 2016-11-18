@@ -68,18 +68,18 @@ SwapHeader (NoffHeader *noffH)
 
 AddrSpace::AddrSpace()
 {
-    pageTable = new TranslationEntry[NumPhysPages];
-    for (int i = 0; i < NumPhysPages; i++) {
-	pageTable[i].virtualPage = i;	// for now, virt page # = phys page #
-	pageTable[i].physicalPage = i;
-	pageTable[i].valid = FALSE;
-	pageTable[i].use = FALSE;
-	pageTable[i].dirty = FALSE;
-	pageTable[i].readOnly = FALSE;
-    }
-
-    // zero out the entire address space
-    bzero(kernel->machine->mainMemory, MemorySize);
+    // pageTable = new TranslationEntry[NumPhysPages];
+    // for (int i = 0; i < NumPhysPages; i++) {
+	// pageTable[i].virtualPage = i;	// for now, virt page # = phys page #
+	// pageTable[i].physicalPage = i;
+	// pageTable[i].valid = FALSE;
+	// pageTable[i].use = FALSE;
+	// pageTable[i].dirty = FALSE;
+	// pageTable[i].readOnly = FALSE;
+    // }
+    //
+    // // zero out the entire address space
+    // bzero(kernel->machine->mainMemory, MemorySize);
 }
 
 //----------------------------------------------------------------------
@@ -146,6 +146,7 @@ AddrSpace::Load(char *fileName)
 
     DEBUG(dbgAddr, "Initializing address space: " << numPages << ", " << size);
 
+    pageTable = new TranslationEntry[numPages];
     for (int i = 0; i < numPages ; i++) {
     int freeFrame = kernel->freeFrameList->Front();
     kernel->freeFrameList->RemoveFront();
