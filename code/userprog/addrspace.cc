@@ -156,7 +156,7 @@ AddrSpace::Load(char *fileName)
         DEBUG(dbgAddr, "Initializing code segment.");
 	    DEBUG(dbgAddr, noffH.code.virtualAddr << ", " << noffH.code.size);
 
-        int paddr;
+        unsigned int paddr;
         AddrSpace::Translate( noffH.code.virtualAddr, &paddr, 0);
 
         executable->ReadAt(
@@ -167,7 +167,7 @@ AddrSpace::Load(char *fileName)
         DEBUG(dbgAddr, "Initializing data segment.");
 	    DEBUG(dbgAddr, noffH.initData.virtualAddr << ", " << noffH.initData.size);
 
-        int paddr;
+        unsigned int paddr;
         AddrSpace::Translate( noffH.code.virtualAddr, &paddr, 0);
 
         executable->ReadAt(
