@@ -145,7 +145,7 @@ AddrSpace::Load(char *fileName)
     pageTable[i].dirty = FALSE;
     pageTable[i].readOnly = FALSE;
     // zero out
-    bzero(kernel->machine->mainMemory[freeFrame*PageSize], PageSize);
+    bzero((void*)(kernel->machine->mainMemory[freeFrame*PageSize]), PageSize);
     }
 
 
