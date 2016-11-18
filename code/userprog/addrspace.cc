@@ -68,7 +68,7 @@ SwapHeader (NoffHeader *noffH)
 
 AddrSpace::AddrSpace()
 {
-
+    pageTable = new TranslationEntry[NumPhysPages];
 }
 
 //----------------------------------------------------------------------
@@ -80,7 +80,7 @@ AddrSpace::~AddrSpace()
 {
     for(int i=0 ; i<numPages ; i++)
         if(pageTable[i].valid)
-            kernel->freeFrameList.Append(pageTable[i].physicalPage);
+            kernel->freeFrameList->Append(pageTable[i].physicalPage);
     delete pageTable;
 }
 
@@ -128,17 +128,16 @@ AddrSpace::Load(char *fileName)
     numPages = divRoundUp(size, PageSize);
     size = numPages * PageSize;
 
-    ASSERT(numPages <= kernel->freeFrameList.NumInList());		// check we're not trying
+    ASSERT(numPages <= kernel->freeFrameList->NumInList());		// check we're not trying
 						// to run anything too big --
 						// at least until we have
 						// virtual memory
 
     DEBUG(dbgAddr, "Initializing address space: " << numPages << ", " << size);
 
-    pageTable = new TranslationEntry[numPages];
     for (int i = 0; i < numPages ; i++) {
-    int freeFrame = kernel->freeFrameList.Front();
-    kernel->freeFrameList.RemoveFront();
+    int freeFrame = kernel->freeFrameList->Front();
+    kernel->freeFrameList->RemoveFront();
     pageTable[i].virtualPage = i;	// for now, virt page # = phys page #
     pageTable[i].physicalPage = freeFrame;
     pageTable[i].valid = TRUE;

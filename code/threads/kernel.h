@@ -54,7 +54,7 @@ class Kernel {
     int Close(int id);
 
     /* MP2 */
-    List<int> freeFrameList;
+    List<int> *freeFrameList;
 
 // These are public for notational convenience; really,
 // they're global variables used everywhere.

@@ -32,7 +32,8 @@ Kernel::Kernel(int argc, char **argv)
     consoleOut = NULL;         // default is stdout
 
     // MP2 Initilize freeFrameList
-    for(int i=0 ; i<NumPhysPages ; i++) freeFrameList.Append(i);
+    freeFrameList = new List<int>;
+    for(int i=0 ; i<NumPhysPages ; i++) freeFrameList->Append(i);
 
 #ifndef FILESYS_STUB
     formatFlag = FALSE;
