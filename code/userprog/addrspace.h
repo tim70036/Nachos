@@ -1,5 +1,5 @@
-// addrspace.h 
-//	Data structures to keep track of executing user programs 
+// addrspace.h
+//	Data structures to keep track of executing user programs
 //	(address spaces).
 //
 //	For now, we don't keep any information about address spaces.
@@ -7,7 +7,7 @@
 //	executing the user program (see thread.h).
 //
 // Copyright (c) 1992-1996 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
+// All rights reserved.  See copyright.h for copyright notice and limitation
 // of liability and disclaimer of warranty provisions.
 
 #ifndef ADDRSPACE_H
@@ -20,6 +20,9 @@
 
 class AddrSpace {
   public:
+
+    static List<int> freeFrameList;
+
     AddrSpace();			// Create an address space.
     ~AddrSpace();			// De-allocate an address space
 
@@ -32,7 +35,7 @@ class AddrSpace {
                                         // been loaded
 
     void SaveState();			// Save/restore address space-specific
-    void RestoreState();		// info on a context switch 
+    void RestoreState();		// info on a context switch
 
     // Translate virtual address _vaddr_
     // to physical address _paddr_. _mode_
@@ -42,12 +45,13 @@ class AddrSpace {
   private:
     TranslationEntry *pageTable;	// Assume linear page table translation
 					// for now!
-    unsigned int numPages;		// Number of pages in the virtual 
+    unsigned int numPages;		// Number of pages in the virtual
 					// address space
 
     void InitRegisters();		// Initialize user-level CPU registers,
 					// before jumping to user code
 
 };
+for(int i=0 ; i<NumPhysPages ; i++) freeFrameList.Append(i);
 
 #endif // ADDRSPACE_H
