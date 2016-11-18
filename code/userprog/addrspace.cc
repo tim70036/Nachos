@@ -79,7 +79,7 @@ AddrSpace::~AddrSpace()
 {
     for(int i=0 ; i<numPages ; i++)
         if(pageTable[i].valid)
-            freeFrameList->Append(pageTable[i].physicalPage);
+            freeFrameList.Append(pageTable[i].physicalPage);
     delete pageTable;
 }
 
@@ -127,7 +127,7 @@ AddrSpace::Load(char *fileName)
     numPages = divRoundUp(size, PageSize);
     size = numPages * PageSize;
 
-    ASSERT(numPages <= freeFrameList->NumInList());		// check we're not trying
+    ASSERT(numPages <= freeFrameList.NumInList());		// check we're not trying
 						// to run anything too big --
 						// at least until we have
 						// virtual memory
@@ -136,8 +136,8 @@ AddrSpace::Load(char *fileName)
 
     pageTable = new TranslationEntry[numPages];
     for (int i = 0; i < numPages ; i++) {
-    int freeFrame = freeFrameList->Front();
-    freeFrameList->RemoveFront();
+    int freeFrame = freeFrameList.Front();
+    freeFrameList.RemoveFront();
     pageTable[i].virtualPage = i;	// for now, virt page # = phys page #
     pageTable[i].physicalPage = freeFrame;
     pageTable[i].valid = TRUE;

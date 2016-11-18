@@ -22,7 +22,7 @@
 class AddrSpace {
   public:
 
-    static List<int> *freeFrameList = new List<int>;
+    static List<int> freeFrameList;
 
     AddrSpace();			// Create an address space.
     ~AddrSpace();			// De-allocate an address space
