@@ -16,6 +16,7 @@
 // of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
+#include "kernel.h"
 #include "main.h"
 #include "addrspace.h"
 #include "machine.h"
@@ -79,7 +80,7 @@ AddrSpace::~AddrSpace()
 {
     for(int i=0 ; i<numPages ; i++)
         if(pageTable[i].valid)
-            freeFrameList.Append(pageTable[i].physicalPage);
+            kernel->freeFrameList.Append(pageTable[i].physicalPage);
     delete pageTable;
 }
 
@@ -127,7 +128,7 @@ AddrSpace::Load(char *fileName)
     numPages = divRoundUp(size, PageSize);
     size = numPages * PageSize;
 
-    ASSERT(numPages <= freeFrameList.NumInList());		// check we're not trying
+    ASSERT(numPages <= kernel->freeFrameList.NumInList());		// check we're not trying
 						// to run anything too big --
 						// at least until we have
 						// virtual memory
@@ -136,8 +137,8 @@ AddrSpace::Load(char *fileName)
 
     pageTable = new TranslationEntry[numPages];
     for (int i = 0; i < numPages ; i++) {
-    int freeFrame = freeFrameList.Front();
-    freeFrameList.RemoveFront();
+    int freeFrame = kernel->freeFrameList.Front();
+    kernel->freeFrameList.RemoveFront();
     pageTable[i].virtualPage = i;	// for now, virt page # = phys page #
     pageTable[i].physicalPage = freeFrame;
     pageTable[i].valid = TRUE;

@@ -53,6 +53,9 @@ class Kernel {
     int Read(char* buffer , int size , int id);
     int Close(int id);
 
+    /* MP2 */
+    List<int> freeFrameList;
+
 // These are public for notational convenience; really,
 // they're global variables used everywhere.
 
