@@ -52,6 +52,5 @@ class AddrSpace {
 					// before jumping to user code
 
 };
-for(int i=0 ; i<NumPhysPages ; i++) freeFrameList.Append(i);
 
 #endif // ADDRSPACE_H
