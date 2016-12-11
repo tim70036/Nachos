@@ -1,4 +1,4 @@
-// scheduler.cc 
+// scheduler.cc
 //	Routines to choose the next thread to run, and to dispatch to
 //	that thread.
 //
@@ -7,21 +7,24 @@
 //	(since we are on a uniprocessor).
 //
 // 	NOTE: We can't use Locks to provide mutual exclusion here, since
-// 	if we needed to wait for a lock, and the lock was busy, we would 
-//	end up calling FindNextToRun(), and that would put us in an 
+// 	if we needed to wait for a lock, and the lock was busy, we would
+//	end up calling FindNextToRun(), and that would put us in an
 //	infinite loop.
 //
 // 	Very simple implementation -- no priorities, straight FIFO.
 //	Might need to be improved in later assignments.
 //
 // Copyright (c) 1992-1996 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
+// All rights reserved.  See copyright.h for copyright notice and limitation
 // of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
 #include "debug.h"
 #include "scheduler.h"
 #include "main.h"
+#include <iostream>
+
+using namespace std;
 
 //----------------------------------------------------------------------
 // Scheduler::Scheduler
@@ -30,10 +33,33 @@
 //----------------------------------------------------------------------
 
 Scheduler::Scheduler()
-{ 
-    readyList = new List<Thread *>; 
+{
+    readyList = new List<Thread *>;
     toBeDestroyed = NULL;
-} 
+
+    /* MP3 Init Queue */
+    L1Queue = new SortedList<Thread *>(burstCmp);
+    L2Queue = new SortedList<Thread *>(priorityCmp);
+}
+
+/* MP3 Compare func */
+int burstCmp(Thread *a, Thread *b)
+{
+    int aTime = a->getBurstTime()
+    int bTime = b->getBurstTime()
+    if(aTime == bTime)  return 0;
+    else if(aTime > bTime) return 1;
+    else return -1;
+}
+
+int priorityCmp(Thread *a, Thread *b)
+{
+    int aPriority = a->getPriority()
+    int bPriority = b->getPriority()
+    if(aPriority == bPriority)  return 0;
+    else if(aPriority > bPriority) return 1;
+    else return -1;
+}
 
 //----------------------------------------------------------------------
 // Scheduler::~Scheduler
@@ -41,9 +67,9 @@ Scheduler::Scheduler()
 //----------------------------------------------------------------------
 
 Scheduler::~Scheduler()
-{ 
-    delete readyList; 
-} 
+{
+    delete readyList;
+}
 
 //----------------------------------------------------------------------
 // Scheduler::ReadyToRun
@@ -60,7 +86,25 @@ Scheduler::ReadyToRun (Thread *thread)
     DEBUG(dbgThread, "Putting thread on ready list: " << thread->getName());
 	//cout << "Putting thread on ready list: " << thread->getName() << endl ;
     thread->setStatus(READY);
-    readyList->Append(thread);
+
+    /* MP3 into queue */
+    int p = thread->getPriority();
+    cout << "Tick " << stats->totalTicks << ": Thread " << thread->getID() << " is inserted into queue L";
+    if(100 <=  p && p <= 149)
+	{
+        L1Queue->Insert(thread);
+        cout << 1 << endl;
+    }
+	else if(50 <= p && p <= 99)
+    {
+		L2Queue->Insert(thread);
+        cout << 2 << endl;
+    }
+	else
+    {
+     readyList->Append(thread);
+     cout << 3 << endl;
+    }
 }
 
 //----------------------------------------------------------------------
@@ -76,11 +120,28 @@ Scheduler::FindNextToRun ()
 {
     ASSERT(kernel->interrupt->getLevel() == IntOff);
 
-    if (readyList->IsEmpty()) {
-		return NULL;
-    } else {
-    	return readyList->RemoveFront();
+    /* MP3 Which is Next ? */
+
+    if(!L1Queue->IsEmpty())
+    {
+        cout << "Tick " << stats->totalTicks << ": Thread " << L1Queue->Front()->getID() << " is removed from queue L";
+        cout << 1 << endl;
+        return L1Queue->RemoveFront();
     }
+    else if(!L2Queue->IsEmpty())
+    {
+        cout << "Tick " << stats->totalTicks << ": Thread " << L2Queue->Front()->getID() << " is removed from queue L";
+        cout << 2 << endl;
+        return L2Queue->RemoveFront();
+    }
+    else if (!readyList->IsEmpty())
+    {
+        cout << "Tick " << stats->totalTicks << ": Thread " << readyList->Front()->getID() << " is removed from queue L";
+        cout << 3 << endl;
+        return readyList->RemoveFront();
+    }
+    else
+        return NULL;
 }
 
 //----------------------------------------------------------------------
@@ -104,36 +165,45 @@ void
 Scheduler::Run (Thread *nextThread, bool finishing)
 {
     Thread *oldThread = kernel->currentThread;
-    
+
     ASSERT(kernel->interrupt->getLevel() == IntOff);
 
     if (finishing) {	// mark that we need to delete current thread
          ASSERT(toBeDestroyed == NULL);
 	 toBeDestroyed = oldThread;
     }
-    
+
     if (oldThread->space != NULL) {	// if this thread is a user program,
         oldThread->SaveUserState(); 	// save the user's CPU registers
 	oldThread->space->SaveState();
     }
-    
+
     oldThread->CheckOverflow();		    // check if the old thread
 					    // had an undetected stack overflow
 
     kernel->currentThread = nextThread;  // switch to the next thread
     nextThread->setStatus(RUNNING);      // nextThread is now running
-    
+
     DEBUG(dbgThread, "Switching from: " << oldThread->getName() << " to: " << nextThread->getName());
-    
-    // This is a machine-dependent assembly language routine defined 
+
+    /* MP3 thread start */
+    nextThread->setStartTime(stats->userTicks);
+    cout << "Tick " << stats->totalTicks << ": Thread " << nextThread->getID() <<" is now selected for execution" << endl;
+    cout << "Tick " << stats->totalTicks << ": Thread " << oldThread->getID() <<" is replaced, and it has executed ";
+    cout << stats->userTicks - oldThread->getStartTime() << " ticks" << endl;
+
+
+    // This is a machine-dependent assembly language routine defined
     // in switch.s.  You may have to think
     // a bit to figure out what happens after this, both from the point
     // of view of the thread and from the perspective of the "outside world".
 
+
+
     SWITCH(oldThread, nextThread);
 
     // we're back, running oldThread
-      
+
     // interrupts are off when we return from switch!
     ASSERT(kernel->interrupt->getLevel() == IntOff);
 
@@ -142,7 +212,7 @@ Scheduler::Run (Thread *nextThread, bool finishing)
     CheckToBeDestroyed();		// check if thread we were running
 					// before this one has finished
 					// and needs to be cleaned up
-    
+
     if (oldThread->space != NULL) {	    // if there is an address space
         oldThread->RestoreUserState();     // to restore, do it.
 	oldThread->space->RestoreState();
@@ -165,7 +235,7 @@ Scheduler::CheckToBeDestroyed()
 	toBeDestroyed = NULL;
     }
 }
- 
+
 //----------------------------------------------------------------------
 // Scheduler::Print
 // 	Print the scheduler state -- in other words, the contents of

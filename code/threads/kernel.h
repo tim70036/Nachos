@@ -79,6 +79,11 @@ class Kernel {
 	Thread* t[10];
 	char*   execfile[10];
 	int execfileNum;
+
+    /* MP3 */
+    int execpriority[10];
+    int execpriorityNum;
+
 	int threadNum;
     bool randomSlice;		// enable pseudo-random time slicing
     bool debugUserProg;         // single step user program

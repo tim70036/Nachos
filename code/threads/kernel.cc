@@ -31,10 +31,6 @@ Kernel::Kernel(int argc, char **argv)
     consoleIn = NULL;          // default is stdin
     consoleOut = NULL;         // default is stdout
 
-    // MP2 Initilize freeFrameList
-    freeFrameList = new List<int>;
-    for(int i=0 ; i<NumPhysPages ; i++) freeFrameList->Append(i);
-
 #ifndef FILESYS_STUB
     formatFlag = FALSE;
 #endif
@@ -53,7 +49,17 @@ Kernel::Kernel(int argc, char **argv)
 		} else if (strcmp(argv[i], "-e") == 0) {
         	execfile[++execfileNum]= argv[++i];
 			cout << execfile[execfileNum] << "\n";
-		} else if (strcmp(argv[i], "-ci") == 0) {
+		}
+
+        /* MP3 */
+        else if (strcmp(argv[i], "-ep") == 0)
+        {
+        	execfile[++execfileNum]= argv[++i];
+            execpriority[++execpriorityNum] = atoi(argv[++i]);
+			cout << execfile[execfileNum] << "\n";
+		}
+
+        else if (strcmp(argv[i], "-ci") == 0) {
 	    	ASSERT(i + 1 < argc);
 	    	consoleIn = argv[i + 1];
 	    	i++;
@@ -111,6 +117,11 @@ Kernel::Initialize()
     synchConsoleIn = new SynchConsoleInput(consoleIn); // input from stdin
     synchConsoleOut = new SynchConsoleOutput(consoleOut); // output to stdout
     synchDisk = new SynchDisk();    //
+
+    // MP2 Initilize freeFrameList
+    freeFrameList = new List<int>;
+    for(int i=0 ; i<NumPhysPages ; i++) freeFrameList->Append(i);
+
 #ifdef FILESYS_STUB
     fileSystem = new FileSystem();
 #else
@@ -266,16 +277,16 @@ void ForkExecute(Thread *t)
 void Kernel::ExecAll()
 {
 	for (int i=1;i<=execfileNum;i++) {
-		int a = Exec(execfile[i]);
+		int a = Exec(execfile[i], execpriority[i]);
 	}
 	currentThread->Finish();
     //Kernel::Exec();
 }
 
 
-int Kernel::Exec(char* name)
+int Kernel::Exec(char* name, int priority)
 {
-	t[threadNum] = new Thread(name, threadNum);
+	t[threadNum] = new Thread(name, threadNum, priority);
 	t[threadNum]->space = new AddrSpace();
 	t[threadNum]->Fork((VoidFunctionPtr) &ForkExecute, (void *)t[threadNum]);
 	threadNum++;
