@@ -200,9 +200,13 @@ Scheduler::Run (Thread *nextThread, bool finishing)
     DEBUG(dbgThread, "Switching from: " << oldThread->getName() << " to: " << nextThread->getName());
 
     /* MP3 thread start */
-    nextThread->setStartTime(kernel->stats->userTicks);
+
     int nowTime = kernel->stats->totalTicks;
-    int oldThreadTime = nowTime - oldThread->getStartTime();
+    int nowUserTime = kernel->stats->userTicks;
+
+    nextThread->setStartTime(nowUserTime);
+    int oldThreadTime = nowUserTime - oldThread->getStartTime();
+    
     cout << "Tick " << nowTime << ": Thread " << nextThread->getID() <<" is now selected for execution" << endl;
     cout << "Tick " << nowTime << ": Thread " << oldThread->getID() <<" is replaced, and it has executed ";
     cout << oldThreadTime << " ticks" << endl;
