@@ -179,6 +179,19 @@ Scheduler::Run (Thread *nextThread, bool finishing)
 {
     Thread *oldThread = kernel->currentThread;
 
+    /* MP3 thread start */
+
+    int nowTime = kernel->stats->totalTicks;
+    int nowUserTime = kernel->stats->userTicks;
+
+    nextThread->setStartTime(nowUserTime);
+    int oldThreadTime = nowUserTime - oldThread->getStartTime();
+
+    cout << "Tick " << nowTime << ": Thread " << nextThread->getID() <<" is now selected for execution" << endl;
+    cout << "Tick " << nowTime << ": Thread " << oldThread->getID() <<" is replaced, and it has executed ";
+    cout << oldThreadTime << " ticks" << endl;
+
+
     ASSERT(kernel->interrupt->getLevel() == IntOff);
 
     if (finishing) {	// mark that we need to delete current thread
@@ -199,17 +212,7 @@ Scheduler::Run (Thread *nextThread, bool finishing)
 
     DEBUG(dbgThread, "Switching from: " << oldThread->getName() << " to: " << nextThread->getName());
 
-    /* MP3 thread start */
 
-    int nowTime = kernel->stats->totalTicks;
-    int nowUserTime = kernel->stats->userTicks;
-
-    nextThread->setStartTime(nowUserTime);
-    int oldThreadTime = nowUserTime - oldThread->getStartTime();
-    
-    cout << "Tick " << nowTime << ": Thread " << nextThread->getID() <<" is now selected for execution" << endl;
-    cout << "Tick " << nowTime << ": Thread " << oldThread->getID() <<" is replaced, and it has executed ";
-    cout << oldThreadTime << " ticks" << endl;
 
 
     // This is a machine-dependent assembly language routine defined

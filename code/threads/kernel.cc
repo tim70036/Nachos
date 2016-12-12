@@ -276,7 +276,10 @@ void ForkExecute(Thread *t)
 
 void Kernel::ExecAll()
 {
-	for (int i=1;i<=execfileNum;i++) {
+    /* MP3 threadNum conflict with postal */
+    threadNum = 2;
+
+    for (int i=1;i<=execfileNum;i++) {
 		int a = Exec(execfile[i], execpriority[i]);
 	}
 	currentThread->Finish();
