@@ -67,7 +67,7 @@ Thread::Thread(char* threadName, int threadID, int priority)
 
 	/* MP3 */
 	burstTime = 0;
-	this.priority = priority;
+	this->priority = priority;
 }
 
 //----------------------------------------------------------------------

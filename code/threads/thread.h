@@ -96,8 +96,8 @@ class Thread {
     void setPriority(int s){ priority = s; }
 
     Thread(char* debugName, int threadID);		// initialize a Thread
-    Thread(char* threadName, int threadID, int priority)
-    
+    Thread(char* threadName, int threadID, int priority);
+
     ~Thread(); 				// deallocate a Thread
 					// NOTE -- thread being deleted
 					// must not be running when delete

@@ -32,6 +32,26 @@ using namespace std;
 //	Initially, no ready threads.
 //----------------------------------------------------------------------
 
+
+/* MP3 Compare func */
+int burstCmp(Thread *a, Thread *b)
+{
+    int aTime = a->getBurstTime();
+    int bTime = b->getBurstTime();
+    if(aTime == bTime)  return 0;
+    else if(aTime > bTime) return 1;
+    else return -1;
+}
+
+int priorityCmp(Thread *a, Thread *b)
+{
+    int aPriority = a->getPriority();
+    int bPriority = b->getPriority();
+    if(aPriority == bPriority)  return 0;
+    else if(aPriority > bPriority) return 1;
+    else return -1;
+}
+
 Scheduler::Scheduler()
 {
     readyList = new List<Thread *>;
@@ -42,24 +62,7 @@ Scheduler::Scheduler()
     L2Queue = new SortedList<Thread *>(priorityCmp);
 }
 
-/* MP3 Compare func */
-int burstCmp(Thread *a, Thread *b)
-{
-    int aTime = a->getBurstTime()
-    int bTime = b->getBurstTime()
-    if(aTime == bTime)  return 0;
-    else if(aTime > bTime) return 1;
-    else return -1;
-}
 
-int priorityCmp(Thread *a, Thread *b)
-{
-    int aPriority = a->getPriority()
-    int bPriority = b->getPriority()
-    if(aPriority == bPriority)  return 0;
-    else if(aPriority > bPriority) return 1;
-    else return -1;
-}
 
 //----------------------------------------------------------------------
 // Scheduler::~Scheduler
@@ -89,7 +92,8 @@ Scheduler::ReadyToRun (Thread *thread)
 
     /* MP3 into queue */
     int p = thread->getPriority();
-    cout << "Tick " << stats->totalTicks << ": Thread " << thread->getID() << " is inserted into queue L";
+    int nowTime = kernel->stats->totalTicks;
+    cout << "Tick " << nowTime << ": Thread " << thread->getID() << " is inserted into queue L";
     if(100 <=  p && p <= 149)
 	{
         L1Queue->Insert(thread);
@@ -130,22 +134,22 @@ Scheduler::FindNextToRun ()
     ASSERT(kernel->interrupt->getLevel() == IntOff);
 
     /* MP3 Which is Next ? */
-
+    int nowTime = kernel->stats->totalTicks;
     if(!L1Queue->IsEmpty())
     {
-        cout << "Tick " << stats->totalTicks << ": Thread " << L1Queue->Front()->getID() << " is removed from queue L";
+        cout << "Tick " << nowTime << ": Thread " << L1Queue->Front()->getID() << " is removed from queue L";
         cout << 1 << endl;
         return L1Queue->RemoveFront();
     }
     else if(!L2Queue->IsEmpty())
     {
-        cout << "Tick " << stats->totalTicks << ": Thread " << L2Queue->Front()->getID() << " is removed from queue L";
+        cout << "Tick " << nowTime << ": Thread " << L2Queue->Front()->getID() << " is removed from queue L";
         cout << 2 << endl;
         return L2Queue->RemoveFront();
     }
     else if (!readyList->IsEmpty())
     {
-        cout << "Tick " << stats->totalTicks << ": Thread " << readyList->Front()->getID() << " is removed from queue L";
+        cout << "Tick " << nowTime << ": Thread " << readyList->Front()->getID() << " is removed from queue L";
         cout << 3 << endl;
         return readyList->RemoveFront();
     }
@@ -196,10 +200,12 @@ Scheduler::Run (Thread *nextThread, bool finishing)
     DEBUG(dbgThread, "Switching from: " << oldThread->getName() << " to: " << nextThread->getName());
 
     /* MP3 thread start */
-    nextThread->setStartTime(stats->userTicks);
-    cout << "Tick " << stats->totalTicks << ": Thread " << nextThread->getID() <<" is now selected for execution" << endl;
-    cout << "Tick " << stats->totalTicks << ": Thread " << oldThread->getID() <<" is replaced, and it has executed ";
-    cout << stats->userTicks - oldThread->getStartTime() << " ticks" << endl;
+    nextThread->setStartTime(kernel->stats->userTicks);
+    int nowTime = kernel->stats->totalTicks;
+    int oldThreadTime = nowTime - oldThread->getStartTime();
+    cout << "Tick " << nowTime << ": Thread " << nextThread->getID() <<" is now selected for execution" << endl;
+    cout << "Tick " << nowTime << ": Thread " << oldThread->getID() <<" is replaced, and it has executed ";
+    cout << oldThreadTime << " ticks" << endl;
 
 
     // This is a machine-dependent assembly language routine defined
