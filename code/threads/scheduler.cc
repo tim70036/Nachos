@@ -105,6 +105,15 @@ Scheduler::ReadyToRun (Thread *thread)
      readyList->Append(thread);
      cout << 3 << endl;
     }
+
+    /* MP3 preemptive only SJF */
+    if(100 <=  p && p <= 149) /* something is added into L1 queue */
+    {
+        if( L1Queue->Front()->getBurstTime() < kernel->currentThread->getBurstTime() )
+        {
+            kernel->currentThread->Yield();
+        }
+    }
 }
 
 //----------------------------------------------------------------------

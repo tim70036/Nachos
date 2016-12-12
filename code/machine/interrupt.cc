@@ -166,12 +166,15 @@ Interrupt::OneTick()
 				// interrupts disabled)
     CheckIfDue(FALSE);		// check for pending interrupts
     ChangeLevel(IntOff, IntOn);	// re-enable interrupts
-    if (yieldOnReturn) {	// if the timer device handler asked
+
+	/* MP3 if currentThread is RR and time to switch */
+    if (yieldOnReturn && kernel->currentThread->getPriority() <= 49)
+	{	// if the timer device handler asked
     				// for a context switch, ok to do it now
-	yieldOnReturn = FALSE;
- 	status = SystemMode;		// yield is a kernel routine
-	kernel->currentThread->Yield();
-	status = oldStatus;
+		yieldOnReturn = FALSE;
+	 	status = SystemMode;		// yield is a kernel routine
+		kernel->currentThread->Yield();
+		status = oldStatus;
     }
 }
 
