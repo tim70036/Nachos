@@ -110,13 +110,15 @@ Scheduler::ReadyToRun (Thread *thread)
      cout << 3 << endl;
     }
 
-    /* MP3 preemptive only SJF */
+    /* MP3 Aging in Queue */
+    thread->agingTimer->Enable();
+    thread->agingTimer->SetInterrupt();
+
+    /* MP3 preemptive , only SJF */
     if(100 <=  p && p <= 149) /* something is added into L1 queue */
-    {
         if( L1Queue->Front()->getBurstTime() < kernel->currentThread->getBurstTime() )
-        {
             kernel->currentThread->Yield();
-        }
+
     }
 }
 
@@ -139,18 +141,30 @@ Scheduler::FindNextToRun ()
     {
         cout << "Tick " << nowTime << ": Thread " << L1Queue->Front()->getID() << " is removed from queue L";
         cout << 1 << endl;
+
+        /* Going to run , no need aging */
+        L1Queue->Front()->agingTimer->Disable();
+
         return L1Queue->RemoveFront();
     }
     else if(!L2Queue->IsEmpty())
     {
         cout << "Tick " << nowTime << ": Thread " << L2Queue->Front()->getID() << " is removed from queue L";
         cout << 2 << endl;
+
+        /* Going to run , no need aging */
+        L2Queue->Front()->agingTimer->Disable();
+
         return L2Queue->RemoveFront();
     }
     else if (!readyList->IsEmpty())
     {
         cout << "Tick " << nowTime << ": Thread " << readyList->Front()->getID() << " is removed from queue L";
         cout << 3 << endl;
+
+        /* Going to run , no need aging */
+        readyList->Front()->agingTimer->Disable();
+
         return readyList->RemoveFront();
     }
     else

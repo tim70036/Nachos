@@ -85,8 +85,13 @@ class Thread {
     int startTime;
     int priority;
 
+
   public:
 
+    /* MP3 thread's timer */
+    AgingTimer* agingTimer;
+
+    /* MP3 Thread getter setter */
     int getStartTime(){ return startTime; }
     double getBurstTime(){ return burstTime; }
     int getPriority(){ return priority; }

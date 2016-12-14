@@ -1,4 +1,4 @@
-// alarm.h 
+// alarm.h
 //	Data structures for a software alarm clock.
 //
 //	We make use of a hardware timer device, that generates
@@ -11,7 +11,7 @@
 //	NOTE: this abstraction is not completely implemented.
 //
 // Copyright (c) 1992-1996 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
+// All rights reserved.  See copyright.h for copyright notice and limitation
 // of liability and disclaimer of warranty provisions.
 
 #ifndef ALARM_H
@@ -22,13 +22,14 @@
 #include "callback.h"
 #include "timer.h"
 
-// The following class defines a software alarm clock. 
+// The following class defines a software alarm clock.
 class Alarm : public CallBackObj {
   public:
-    Alarm(bool doRandomYield);	// Initialize the timer, and callback 
+
+    Alarm(bool doRandomYield);	// Initialize the timer, and callback
 				// to "toCall" every time slice.
     ~Alarm() { delete timer; }
-    
+
     void WaitUntil(int x);	// suspend execution until time > now + x
                                 // this method is not yet implemented
 
