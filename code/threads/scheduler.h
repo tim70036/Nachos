@@ -34,12 +34,16 @@ class Scheduler {
 
     // SelfTest for scheduler is implemented in class Thread
 
+    /* MP3 */
+    void CheckAging(Thread *thread);
+
   private:
     List<Thread *> *readyList;  // queue of threads that are ready to run,
 				// but not running
     Thread *toBeDestroyed;	// finishing thread to be destroyed
     				// by the next thread that runs
 
+    /* MP3 add 2 more queue */
     SortedList<Thread *> *L1Queue;
     SortedList<Thread *> *L2Queue;
 };

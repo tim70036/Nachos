@@ -176,6 +176,20 @@ Interrupt::OneTick()
 		kernel->currentThread->Yield();
 		status = oldStatus;
     }
+
+	/* MP3 Check Aging */
+	ListIterator<Thread *> *iterL1(kernel->scheduler->L1Queue);
+	ListIterator<Thread *> *iterL2(kernel->scheduler->L2Queue);
+	ListIterator<Thread *> *iterL3(kernel->scheduler->readyList);
+
+	for (; !iterL1->IsDone(); iterL1->Next())
+		kernel->scheduler->CheckAging(iterL1->Item());
+
+	for (; !iterL2->IsDone(); iterL1->Next())
+		kernel->scheduler->CheckAging(iterL2->Item());
+
+	for (; !iterL3->IsDone(); iterL1->Next())
+		kernel->scheduler->CheckAging(iterL3->Item());
 }
 
 //----------------------------------------------------------------------

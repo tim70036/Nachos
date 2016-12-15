@@ -52,6 +52,44 @@ int priorityCmp(Thread *a, Thread *b)
     else return -1;
 }
 
+/* MP3 Check aging */
+void Scheduler::CheckAging(Thread *thread)
+{
+    int nowTime = kernel->stats->totalTicks;
+    /* In ready queue and wait time >= 1500 */
+    if(thread->getStatus() == Thread::READY && nowTime - thread->getStartWaitTime() >= 1500)
+    {
+        /* Aging */
+        int oldPriority = thread->getPriority();
+        int newPriority = (oldPriority + 10 > 149) ? 149 : oldPriority + 10;
+        thread->setPriority(newPriority);
+
+        cout << "Tick " << nowTime << ": Thread " << thread->getID();
+        cout << " changes its priority from " << oldPriority << " to " << newPriority << endl;
+
+        if(newPriority >= 100 && newPriority < 110) /* L2 -> L1 */
+        {
+            kernel->scheduler->L2Queue->Remove(thread);
+            kernel->scheduler->L1Queue->Insert(thread);
+
+            cout << "Tick " << nowTime << ": Thread " << thread->getID() << " is removed from queue L2" << endl;
+            cout << "Tick " << nowTime << ": Thread " << thread->getID() << " is inserted into queue L1"<< endl;
+
+            /* Preemptive , Only SJF */
+            if( L1Queue->Front()->getBurstTime() < kernel->currentThread->getBurstTime() )
+                kernel->currentThread->Yield();
+        }
+        else if(newPriority >= 50 && newPriority < 60) /* L3 -> L2 */
+        {
+            kernel->scheduler->readyList->Remove(thread);
+            kernel->scheduler->L2Queue->Insert(thread);
+
+            cout << "Tick " << nowTime << ": Thread " << thread->getID() << " is removed from queue L3" << endl;
+            cout << "Tick " << nowTime << ": Thread " << thread->getID() << " is inserted into queue L2" << endl;
+        }
+    }
+}
+
 Scheduler::Scheduler()
 {
     readyList = new List<Thread *>;
@@ -110,9 +148,8 @@ Scheduler::ReadyToRun (Thread *thread)
      cout << 3 << endl;
     }
 
-    /* MP3 Aging in Queue */
-    thread->agingTimer->Enable();
-    thread->agingTimer->SetInterrupt();
+    /* MP3 Aging , now thread starts to wait */
+    thread->setStartWaitTime(nowTime);
 
     /* MP3 preemptive , only SJF */
     if(100 <=  p && p <= 149) /* something is added into L1 queue */

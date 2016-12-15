@@ -84,21 +84,21 @@ class Thread {
     double burstTime;
     int startTime;
     int priority;
+    int startWaitTime;
 
 
   public:
-
-    /* MP3 thread's timer */
-    AgingTimer* agingTimer;
 
     /* MP3 Thread getter setter */
     int getStartTime(){ return startTime; }
     double getBurstTime(){ return burstTime; }
     int getPriority(){ return priority; }
+    int getStartWaitTime() { return startWaitTime; }
 
     void setStartTime(int s){ startTime = s; }
     void setBurstTime(double s){ burstTime = s; }
     void setPriority(int s){ priority = s; }
+    void setStartWaitTime(int s){ startWaitTime = s; }
 
     Thread(char* debugName, int threadID);		// initialize a Thread
     Thread(char* threadName, int threadID, int priority);
