@@ -53,7 +53,7 @@ int priorityCmp(Thread *a, Thread *b)
 }
 
 /* MP3 Check aging */
-void Scheduler::CheckAging(Thread *thread)
+bool Scheduler::CheckAging(Thread *thread)
 {
     int nowTime = kernel->stats->totalTicks;
     /* In ready queue and wait time >= 1500 */
@@ -69,7 +69,8 @@ void Scheduler::CheckAging(Thread *thread)
 
         if(newPriority >= 100 && newPriority < 110) /* L2 -> L1 */
         {
-            kernel->scheduler->L2Queue->Remove(thread);
+            if(kernel->scheduler->L2Queue->IsInList(thread))
+                kernel->scheduler->L2Queue->Remove(thread);
             kernel->scheduler->L1Queue->Insert(thread);
 
             cout << "Tick " << nowTime << ": Thread " << thread->getID() << " is removed from queue L2" << endl;
@@ -89,7 +90,10 @@ void Scheduler::CheckAging(Thread *thread)
         }
         /* Reset wait time */
         thread->setStartWaitTime(nowTime);
+
+        return TRUE;
     }
+    return FALSE;
 }
 
 Scheduler::Scheduler()

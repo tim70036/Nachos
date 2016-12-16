@@ -186,16 +186,16 @@ Interrupt::OneTick()
 	{
 		Thread* t = iterL1->Item();
 		kernel->scheduler->L1Queue->Remove(t);
-		kernel->scheduler->CheckAging(t);
-		kernel->scheduler->L1Queue->Insert(t);
+		bool ag = kernel->scheduler->CheckAging(t);
+		if(!ag) kernel->scheduler->L1Queue->Insert(t);
   	}
 
 	for (; !iterL2->IsDone(); iterL2->Next())
 	{
 		Thread* t = iterL2->Item();
 		kernel->scheduler->L2Queue->Remove(t);
-		kernel->scheduler->CheckAging(t);
-		kernel->scheduler->L2Queue->Insert(t);
+		bool ag = kernel->scheduler->CheckAging(t);
+		if(!ag) kernel->scheduler->L2Queue->Insert(t);
 	}
 
 	for (; !iterL3->IsDone(); iterL3->Next())
