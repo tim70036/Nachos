@@ -178,9 +178,9 @@ Interrupt::OneTick()
     }
 
 	/* MP3 Check Aging */
-	ListIterator<Thread *> *iterL1(kernel->scheduler->L1Queue);
-	ListIterator<Thread *> *iterL2(kernel->scheduler->L2Queue);
-	ListIterator<Thread *> *iterL3(kernel->scheduler->readyList);
+	ListIterator<Thread *> *iterL1 = new ListIterator<Thread *>(kernel->scheduler->getL1Queue());
+	ListIterator<Thread *> *iterL2 = new ListIterator<Thread *>(kernel->scheduler->getL2Queue());
+	ListIterator<Thread *> *iterL3 = new ListIterator<Thread *>(kernel->scheduler->getReadyList());
 
 	for (; !iterL1->IsDone(); iterL1->Next())
 		kernel->scheduler->CheckAging(iterL1->Item());

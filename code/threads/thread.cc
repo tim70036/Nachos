@@ -49,7 +49,6 @@ Thread::Thread(char* threadName, int threadID)
 
 	/* MP3 */
 	burstTime = 0;
-	agingTimer = new AgingTimer(kernel->alarm, this);
 }
 
 Thread::Thread(char* threadName, int threadID, int priority)
@@ -69,7 +68,6 @@ Thread::Thread(char* threadName, int threadID, int priority)
 	/* MP3 */
 	burstTime = 0;
 	this->priority = priority;
-	agingTimer = new AgingTimer(kernel->alarm, this);
 }
 
 //----------------------------------------------------------------------

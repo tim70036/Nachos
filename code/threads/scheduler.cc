@@ -57,7 +57,7 @@ void Scheduler::CheckAging(Thread *thread)
 {
     int nowTime = kernel->stats->totalTicks;
     /* In ready queue and wait time >= 1500 */
-    if(thread->getStatus() == Thread::READY && nowTime - thread->getStartWaitTime() >= 1500)
+    if(thread->getStatus() == READY && nowTime - thread->getStartWaitTime() >= 1500)
     {
         /* Aging */
         int oldPriority = thread->getPriority();
@@ -156,7 +156,6 @@ Scheduler::ReadyToRun (Thread *thread)
         if( L1Queue->Front()->getBurstTime() < kernel->currentThread->getBurstTime() )
             kernel->currentThread->Yield();
 
-    }
 }
 
 //----------------------------------------------------------------------
@@ -179,9 +178,6 @@ Scheduler::FindNextToRun ()
         cout << "Tick " << nowTime << ": Thread " << L1Queue->Front()->getID() << " is removed from queue L";
         cout << 1 << endl;
 
-        /* Going to run , no need aging */
-        L1Queue->Front()->agingTimer->Disable();
-
         return L1Queue->RemoveFront();
     }
     else if(!L2Queue->IsEmpty())
@@ -189,18 +185,12 @@ Scheduler::FindNextToRun ()
         cout << "Tick " << nowTime << ": Thread " << L2Queue->Front()->getID() << " is removed from queue L";
         cout << 2 << endl;
 
-        /* Going to run , no need aging */
-        L2Queue->Front()->agingTimer->Disable();
-
         return L2Queue->RemoveFront();
     }
     else if (!readyList->IsEmpty())
     {
         cout << "Tick " << nowTime << ": Thread " << readyList->Front()->getID() << " is removed from queue L";
         cout << 3 << endl;
-
-        /* Going to run , no need aging */
-        readyList->Front()->agingTimer->Disable();
 
         return readyList->RemoveFront();
     }

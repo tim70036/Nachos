@@ -36,16 +36,18 @@ class Scheduler {
 
     /* MP3 */
     void CheckAging(Thread *thread);
+    List<Thread *> *readyList;  // queue of threads that are ready to run,
+    /* MP3 add 2 more queue */
+    SortedList<Thread *> *L1Queue;
+    SortedList<Thread *> *L2Queue;
 
   private:
-    List<Thread *> *readyList;  // queue of threads that are ready to run,
+
 				// but not running
     Thread *toBeDestroyed;	// finishing thread to be destroyed
     				// by the next thread that runs
 
-    /* MP3 add 2 more queue */
-    SortedList<Thread *> *L1Queue;
-    SortedList<Thread *> *L2Queue;
+
 };
 
 #endif // SCHEDULER_H
