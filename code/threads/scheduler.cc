@@ -87,6 +87,8 @@ void Scheduler::CheckAging(Thread *thread)
             cout << "Tick " << nowTime << ": Thread " << thread->getID() << " is removed from queue L3" << endl;
             cout << "Tick " << nowTime << ": Thread " << thread->getID() << " is inserted into queue L2" << endl;
         }
+        /* Reset wait time */
+        thread->setStartWaitTime(nowTime);
     }
 }
 

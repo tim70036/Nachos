@@ -183,10 +183,20 @@ Interrupt::OneTick()
 	ListIterator<Thread *> *iterL3 = new ListIterator<Thread *>(kernel->scheduler->readyList);
 
 	for (; !iterL1->IsDone(); iterL1->Next())
-		kernel->scheduler->CheckAging(iterL1->Item());
+	{
+		Thread* t = iterL1->Item();
+		kernel->scheduler->L1Queue->Remove(t);
+		kernel->scheduler->CheckAging(t);
+		kernel->scheduler->L1Queue->Insert(t);
+  	}
 
 	for (; !iterL2->IsDone(); iterL2->Next())
-		kernel->scheduler->CheckAging(iterL2->Item());
+	{
+		Thread* t = iterL2->Item();
+		kernel->scheduler->L2Queue->Remove(t);
+		kernel->scheduler->CheckAging(t);
+		kernel->scheduler->L2Queue->Insert(t);
+	}
 
 	for (; !iterL3->IsDone(); iterL3->Next())
 		kernel->scheduler->CheckAging(iterL3->Item());
