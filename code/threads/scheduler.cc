@@ -48,8 +48,8 @@ int priorityCmp(Thread *a, Thread *b)
     int aPriority = a->getPriority();
     int bPriority = b->getPriority();
     if(aPriority == bPriority)  return 0;
-    else if(aPriority > bPriority) return 1;
-    else return -1;
+    else if(aPriority > bPriority) return -1;
+    else return 1;
 }
 
 /* MP3 Check aging */
@@ -63,35 +63,43 @@ bool Scheduler::CheckAging(Thread *thread)
         int oldPriority = thread->getPriority();
         int newPriority = (oldPriority + 10 > 149) ? 149 : oldPriority + 10;
         thread->setPriority(newPriority);
-
-        cout << "Tick " << nowTime << ": Thread " << thread->getID();
-        cout << " changes its priority from " << oldPriority << " to " << newPriority << endl;
+        if(oldPriority != newPriority){
+          cout << "Tick " << nowTime << ": Thread " << thread->getID();
+          cout << " changes its priority from " << oldPriority << " to " << newPriority << endl;
+        }
 
         if(newPriority >= 100 && newPriority < 110) /* L2 -> L1 */
         {
             if(kernel->scheduler->L2Queue->IsInList(thread))
                 kernel->scheduler->L2Queue->Remove(thread);
             kernel->scheduler->L1Queue->Insert(thread);
-
             cout << "Tick " << nowTime << ": Thread " << thread->getID() << " is removed from queue L2" << endl;
             cout << "Tick " << nowTime << ": Thread " << thread->getID() << " is inserted into queue L1"<< endl;
 
             /* Preemptive , Only SJF */
-            if( L1Queue->Front()->getBurstTime() < kernel->currentThread->getBurstTime() )
-                kernel->currentThread->Yield();
+            if( 100 <= kernel->currentThread->getPriority() && kernel->currentThread->getPriority() <= 149 )
+            {
+   	          if(kernel->currentThread->getID() != thread->getID())
+              {
+   	            double actBurst = kernel->stats->userTicks - kernel->currentThread->getStartTime();
+		            double estBurst = 0.5 * actBurst + 0.5 * kernel->currentThread->getBurstTime();
+                if(thread->getBurstTime() < estBurst)
+                  kernel->currentThread->Yield();
+              }
+            }
+            /* Reset wait time */
+            thread->setStartWaitTime(nowTime);
+            return TRUE;
         }
         else if(newPriority >= 50 && newPriority < 60) /* L3 -> L2 */
         {
             kernel->scheduler->readyList->Remove(thread);
             kernel->scheduler->L2Queue->Insert(thread);
-
             cout << "Tick " << nowTime << ": Thread " << thread->getID() << " is removed from queue L3" << endl;
             cout << "Tick " << nowTime << ": Thread " << thread->getID() << " is inserted into queue L2" << endl;
         }
         /* Reset wait time */
         thread->setStartWaitTime(nowTime);
-
-        return TRUE;
     }
     return FALSE;
 }
@@ -159,9 +167,18 @@ Scheduler::ReadyToRun (Thread *thread)
 
     /* MP3 preemptive , only SJF */
     if(100 <=  p && p <= 149) /* something is added into L1 queue */
-        if( L1Queue->Front()->getBurstTime() < kernel->currentThread->getBurstTime() )
-            kernel->currentThread->Yield();
-
+    {
+        if( 100 <= kernel->currentThread->getPriority() && kernel->currentThread->getPriority() <= 149 )
+        {
+          if(kernel->currentThread->getID() != thread->getID())
+          {
+   	        double actBurst = kernel->stats->userTicks - kernel->currentThread->getStartTime();
+		        double estBurst = 0.5 * actBurst + 0.5 * kernel->currentThread->getBurstTime();
+            if(thread->getBurstTime() < estBurst)
+              kernel->currentThread->Yield();
+          }
+        }
+    }
 }
 
 //----------------------------------------------------------------------

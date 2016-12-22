@@ -231,9 +231,7 @@ Thread::Yield ()
 
     DEBUG(dbgThread, "Yielding thread: " << name);
 
-	/* MP3 Yield WTF? */
-
-	/* SJF ? */
+	/* SJF  */
 	if(this->getPriority() >= 100)
 	{
 		double actBurst = kernel->stats->userTicks - this->getStartTime();
@@ -241,11 +239,10 @@ Thread::Yield ()
 		this->setBurstTime(estBurst);
 	}
 
-
-	nextThread = kernel->scheduler->FindNextToRun();
+	  nextThread = kernel->scheduler->FindNextToRun();
     if (nextThread != NULL) {
-		kernel->scheduler->ReadyToRun(this);
-		kernel->scheduler->Run(nextThread, FALSE);
+		  kernel->scheduler->ReadyToRun(this);
+		  kernel->scheduler->Run(nextThread, FALSE);
     }
 
     (void) kernel->interrupt->SetLevel(oldLevel);

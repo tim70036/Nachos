@@ -1,4 +1,4 @@
-// scheduler.h
+ // scheduler.h
 //	Data structures for the thread dispatcher and scheduler.
 //	Primarily, the list of threads that are ready to run.
 //
