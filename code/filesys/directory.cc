@@ -37,6 +37,10 @@
 Directory::Directory(int size)
 {
     table = new DirectoryEntry[size];
+	
+	// MP4 mod tag
+	memset(table, 0, sizeof(DirectoryEntry) * size);  // dummy operation to keep valgrind happy
+	
     tableSize = size;
     for (int i = 0; i < tableSize; i++)
 	table[i].inUse = FALSE;

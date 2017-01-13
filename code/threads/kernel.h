@@ -2,7 +2,7 @@
 //	Global variables for the Nachos kernel.
 //
 // Copyright (c) 1992-1996 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation
+// All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
 #ifndef KERNEL_H
@@ -32,43 +32,39 @@ class Kernel {
     Kernel(int argc, char **argv);
     				// Interpret command line arguments
     ~Kernel();		        // deallocate the kernel
-
+    
     void Initialize(); 		// initialize the kernel -- separated
-				// from constructor because
+				// from constructor because 
 				// refers to "kernel" as a global
+				
+	// 2015.11.25 added
+	void PrepareToEnd(); // called before all running programs end
+	
 	void ExecAll();
-	int Exec(char* name, int priority);
+	int Exec(char* name);
     void ThreadSelfTest();	// self test of threads and synchronization
-
+	
     void ConsoleTest();         // interactive console self test
     void NetworkTest();         // interactive 2-machine network test
-	Thread* getThread(int threadID){return t[threadID];}
+	Thread* getThread(int threadID){return t[threadID];}    
 
+	#ifdef FILESYS_STUB	
 	int CreateFile(char* filename); // fileSystem call
+	#endif
 
-    /* MP1 */
-    void PrintInt(int n);
-    int Open(char *filename);
-    int Write(char* buffer , int size , int id);
-    int Read(char* buffer , int size , int id);
-    int Close(int id);
-
-    /* MP2 */
-    List<int> *freeFrameList;
-
-// These are public for notational convenience; really,
+// These are public for notational convenience; really, 
 // they're global variables used everywhere.
 
     Thread *currentThread;	// the thread holding the CPU
     Scheduler *scheduler;	// the ready list
     Interrupt *interrupt;	// interrupt status
     Statistics *stats;		// performance metrics
-    Alarm *alarm;		// the software alarm clock
+    Alarm *alarm;		// the software alarm clock    
     Machine *machine;           // the simulated CPU
     SynchConsoleInput *synchConsoleIn;
     SynchConsoleOutput *synchConsoleOut;
     SynchDisk *synchDisk;
-    FileSystem *fileSystem;
+    FileSystem *fileSystem;     
     PostOfficeInput *postOfficeIn;
     PostOfficeOutput *postOfficeOut;
 
@@ -79,11 +75,6 @@ class Kernel {
 	Thread* t[10];
 	char*   execfile[10];
 	int execfileNum;
-
-    /* MP3 */
-    int execpriority[10];
-    int execpriorityNum;
-
 	int threadNum;
     bool randomSlice;		// enable pseudo-random time slicing
     bool debugUserProg;         // single step user program
@@ -97,3 +88,5 @@ class Kernel {
 
 
 #endif // KERNEL_H
+
+

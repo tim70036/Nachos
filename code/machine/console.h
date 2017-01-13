@@ -57,6 +57,8 @@ class ConsoleInput : public CallBackObj {
 
     void CallBack();		// Invoked when a character arrives
 				// from the keyboard.
+				
+	void Disable() { disabled = true; } // 2015.11.25
 
   private:
     int readFileNo;			// UNIX file emulating the keyboard 
@@ -65,6 +67,8 @@ class ConsoleInput : public CallBackObj {
     char incoming;    			// Contains the character to be read,
 					// if there is one available. 
 					// Otherwise contains EOF.
+	//2015.11.25
+	bool disabled;
 };
 
 class ConsoleOutput : public CallBackObj {

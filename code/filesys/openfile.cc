@@ -160,6 +160,9 @@ OpenFile::WriteAt(char *from, int numBytes, int position)
     numSectors = 1 + lastSector - firstSector;
 
     buf = new char[numSectors * SectorSize];
+	
+	// Mp4 mod tag
+	memset(buf, 0, sizeof(char) * numSectors * SectorSize); // dummy operation to keep valgrind happy
 
     firstAligned = (position == (firstSector * SectorSize));
     lastAligned = ((position + numBytes) == ((lastSector + 1) * SectorSize));

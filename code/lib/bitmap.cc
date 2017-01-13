@@ -42,7 +42,7 @@ Bitmap::Bitmap(int numItems)
 
 Bitmap::~Bitmap()
 { 
-    delete map;
+    delete [] map;
 }
 
 //----------------------------------------------------------------------

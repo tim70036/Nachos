@@ -35,6 +35,7 @@ ConsoleInput::ConsoleInput(char *readFile, CallBackObj *toCall)
     // set up the stuff to emulate asynchronous interrupts
     callWhenAvail = toCall;
     incoming = EOF;
+	disabled = false; // 2015.11.25
 
     // start polling for incoming keystrokes
     kernel->interrupt->Schedule(this, ConsoleTime, ConsoleReadInt);
@@ -68,6 +69,12 @@ ConsoleInput::CallBack()
   int readCount;
 
     ASSERT(incoming == EOF);
+	// 2015.11.25
+	// do not schedule any more interrupts if console is disabled
+	if (disabled) {
+		return;
+	}
+	
     if (!PollFile(readFileNo)) { // nothing to be read
         // schedule the next time to poll for a packet
         kernel->interrupt->Schedule(this, ConsoleTime, ConsoleReadInt);

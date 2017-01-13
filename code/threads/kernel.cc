@@ -1,8 +1,8 @@
-// kernel.cc
+// kernel.cc 
 //	Initialization and cleanup routines for the Nachos kernel.
 //
 // Copyright (c) 1992-1996 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation
+// All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
@@ -20,23 +20,26 @@
 
 //----------------------------------------------------------------------
 // Kernel::Kernel
-// 	Interpret command line arguments in order to determine flags
-//	for the initialization (see also comments in main.cc)
+// 	Interpret command line arguments in order to determine flags 
+//	for the initialization (see also comments in main.cc)  
 //----------------------------------------------------------------------
 
 Kernel::Kernel(int argc, char **argv)
 {
-    randomSlice = FALSE;
+    randomSlice = FALSE; 
     debugUserProg = FALSE;
     consoleIn = NULL;          // default is stdin
     consoleOut = NULL;         // default is stdout
-
 #ifndef FILESYS_STUB
     formatFlag = FALSE;
 #endif
     reliability = 1;            // network reliability, default is 1.0
     hostName = 0;               // machine id, also UNIX socket name
                                 // 0 is the default machine id
+								
+	// MP4 mod tag
+	execfileNum = 0; // dummy operation to keep valgrind happy
+								
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-rs") == 0) {
  	    	ASSERT(i + 1 < argc);
@@ -49,17 +52,7 @@ Kernel::Kernel(int argc, char **argv)
 		} else if (strcmp(argv[i], "-e") == 0) {
         	execfile[++execfileNum]= argv[++i];
 			cout << execfile[execfileNum] << "\n";
-		}
-
-        /* MP3 */
-        else if (strcmp(argv[i], "-ep") == 0)
-        {
-        	execfile[++execfileNum]= argv[++i];
-            execpriority[++execpriorityNum] = atoi(argv[++i]);
-			cout << execfile[execfileNum] << "\n";
-		}
-
-        else if (strcmp(argv[i], "-ci") == 0) {
+		} else if (strcmp(argv[i], "-ci") == 0) {
 	    	ASSERT(i + 1 < argc);
 	    	consoleIn = argv[i + 1];
 	    	i++;
@@ -93,7 +86,7 @@ Kernel::Kernel(int argc, char **argv)
 
 //----------------------------------------------------------------------
 // Kernel::Initialize
-// 	Initialize Nachos global data structures.  Separate from the
+// 	Initialize Nachos global data structures.  Separate from the 
 //	constructor because some of these refer to earlier initialized
 //	data via the "kernel" global variable.
 //----------------------------------------------------------------------
@@ -103,10 +96,10 @@ Kernel::Initialize()
 {
     // We didn't explicitly allocate the current thread we are running in.
     // But if it ever tries to give up the CPU, we better have a Thread
-    // object to save its state.
+    // object to save its state. 
 
-
-    currentThread = new Thread("main", threadNum++);
+	
+    currentThread = new Thread("main", threadNum++);		
     currentThread->setStatus(RUNNING);
 
     stats = new Statistics();		// collect statistics
@@ -117,20 +110,33 @@ Kernel::Initialize()
     synchConsoleIn = new SynchConsoleInput(consoleIn); // input from stdin
     synchConsoleOut = new SynchConsoleOutput(consoleOut); // output to stdout
     synchDisk = new SynchDisk();    //
-
-    // MP2 Initilize freeFrameList
-    freeFrameList = new List<int>;
-    for(int i=0 ; i<NumPhysPages ; i++) freeFrameList->Append(i);
-
 #ifdef FILESYS_STUB
     fileSystem = new FileSystem();
 #else
     fileSystem = new FileSystem(formatFlag);
 #endif // FILESYS_STUB
-    postOfficeIn = new PostOfficeInput(10);
+
+	// MP4 mod tag
+    /*
+	postOfficeIn = new PostOfficeInput(10);
     postOfficeOut = new PostOfficeOutput(reliability);
+	*/
 
     interrupt->Enable();
+}
+
+//----------------------------------------------------------------------
+//	MP4 mod tag
+//	Kernel::PrepareToEnd
+// 	Since Nachos does not disable Timer, Console after all threads complete,
+//	which will result in generating infinite interrupts. We manually disable timer,
+//	console, etc. after all threads complete.
+//----------------------------------------------------------------------
+void
+Kernel::PrepareToEnd()
+{
+	alarm->Disable();
+	synchConsoleIn->Disable();
 }
 
 //----------------------------------------------------------------------
@@ -149,9 +155,13 @@ Kernel::~Kernel()
     delete synchConsoleOut;
     delete synchDisk;
     delete fileSystem;
+	
+	// Mp4 mod tag
+	/*
     delete postOfficeIn;
     delete postOfficeOut;
-
+    */
+	
     Exit(0);
 }
 
@@ -164,16 +174,16 @@ void
 Kernel::ThreadSelfTest() {
    Semaphore *semaphore;
    SynchList<int> *synchList;
-
+   
    LibSelfTest();		// test library routines
-
+   
    currentThread->SelfTest();	// test thread switching
-
+   
    				// test semaphore operation
    semaphore = new Semaphore("test", 0);
    semaphore->SelfTest();
    delete semaphore;
-
+   
    				// test locks, condition variables
 				// using synchronized lists
    synchList = new SynchList<int>;
@@ -191,7 +201,7 @@ void
 Kernel::ConsoleTest() {
     char ch;
 
-    cout << "Testing the console device.\n"
+    cout << "Testing the console device.\n" 
         << "Typed characters will be echoed, until ^D is typed.\n"
         << "Note newlines are needed to flush input through UNIX.\n";
     cout.flush();
@@ -212,7 +222,7 @@ Kernel::ConsoleTest() {
 //      1. send a message to the other machine at mail box #0
 //      2. wait for the other machine's message to arrive (in our mailbox #0)
 //      3. send an acknowledgment for the other machine's message
-//      4. wait for an acknowledgement from the other machine to our
+//      4. wait for an acknowledgement from the other machine to our 
 //          original message
 //
 //  This test works best if each Nachos machine has its own window
@@ -223,7 +233,7 @@ Kernel::NetworkTest() {
 
     if (hostName == 0 || hostName == 1) {
         // if we're machine 1, send to 0 and vice versa
-        int farHost = (hostName == 0 ? 1 : 0);
+        int farHost = (hostName == 0 ? 1 : 0); 
         PacketHeader outPktHdr, inPktHdr;
         MailHeader outMailHdr, inMailHdr;
         char *data = "Hello there!";
@@ -233,17 +243,17 @@ Kernel::NetworkTest() {
         // construct packet, mail header for original message
         // To: destination machine, mailbox 0
         // From: our machine, reply to: mailbox 1
-        outPktHdr.to = farHost;
+        outPktHdr.to = farHost;         
         outMailHdr.to = 0;
         outMailHdr.from = 1;
         outMailHdr.length = strlen(data) + 1;
 
         // Send the first message
-        postOfficeOut->Send(outPktHdr, outMailHdr, data);
+        postOfficeOut->Send(outPktHdr, outMailHdr, data); 
 
         // Wait for the first message from the other machine
         postOfficeIn->Receive(0, &inPktHdr, &inMailHdr, buffer);
-        cout << "Got: " << buffer << " : from " << inPktHdr.from << ", box "
+        cout << "Got: " << buffer << " : from " << inPktHdr.from << ", box " 
                                                 << inMailHdr.from << "\n";
         cout.flush();
 
@@ -252,11 +262,11 @@ Kernel::NetworkTest() {
         outPktHdr.to = inPktHdr.from;
         outMailHdr.to = inMailHdr.from;
         outMailHdr.length = strlen(ack) + 1;
-        postOfficeOut->Send(outPktHdr, outMailHdr, ack);
+        postOfficeOut->Send(outPktHdr, outMailHdr, ack); 
 
         // Wait for the ack from the other machine to the first message we sent
 	postOfficeIn->Receive(1, &inPktHdr, &inMailHdr, buffer);
-        cout << "Got: " << buffer << " : from " << inPktHdr.from << ", box "
+        cout << "Got: " << buffer << " : from " << inPktHdr.from << ", box " 
                                                 << inMailHdr.from << "\n";
         cout.flush();
     }
@@ -269,27 +279,24 @@ void ForkExecute(Thread *t)
 	if ( !t->space->Load(t->getName()) ) {
     	return;             // executable not found
     }
-
+	
     t->space->Execute(t->getName());
 
 }
 
 void Kernel::ExecAll()
 {
-    /* MP3 threadNum conflict with postal */
-    threadNum = 2;
-
-    for (int i=1;i<=execfileNum;i++) {
-		int a = Exec(execfile[i], execpriority[i]);
+	for (int i=1;i<=execfileNum;i++) {
+		int a = Exec(execfile[i]);
 	}
 	currentThread->Finish();
-    //Kernel::Exec();
+    //Kernel::Exec();	
 }
 
 
-int Kernel::Exec(char* name, int priority)
+int Kernel::Exec(char* name)
 {
-	t[threadNum] = new Thread(name, threadNum, priority);
+	t[threadNum] = new Thread(name, threadNum);
 	t[threadNum]->space = new AddrSpace();
 	t[threadNum]->Fork((VoidFunctionPtr) &ForkExecute, (void *)t[threadNum]);
 	threadNum++;
@@ -303,7 +310,7 @@ int Kernel::Exec(char* name, int priority)
 		t[n]->Fork((VoidFunctionPtr) &ForkExecute, (void *)t[n]);
 		cout << "Thread " << execfile[n] << " is executing." << endl;
 	}
-	cout << "debug Kernel::Run finished.\n";
+	cout << "debug Kernel::Run finished.\n";	
 */
 //  Thread *t1 = new Thread(execfile[1]);
 //  Thread *t1 = new Thread("../test/test1");
@@ -322,81 +329,10 @@ int Kernel::Exec(char* name, int priority)
 //  cout << "after ThreadedKernel:Run();" << endl;  // unreachable
 }
 
+#ifdef FILESYS_STUB
 int Kernel::CreateFile(char *filename)
 {
 	return fileSystem->Create(filename);
 }
+#endif
 
-
-/* MP1 */
-void Kernel::PrintInt(int n)
-{
-    if(n == 0)
-    {
-        synchConsoleOut->PutChar((char)(n+48));
-        return;
-    }
-
-    int remain = 0;
-    int index = 0;
-    char num[3000];
-
-    /* Check Negative ? */
-    int isNegative = (n > 0) ? 0 : 1;
-    if(isNegative) n *= -1;
-
-    while(n > 0)
-    {
-        remain = n % 10;
-        n /= 10;
-        num[index++] = (char)(remain+48);
-    }
-
-    /* Output '-' */
-    if(isNegative) synchConsoleOut->PutChar('-');
-
-    index--;
-    while(index >=0 ) synchConsoleOut->PutChar(num[index--]);
-    synchConsoleOut->PutChar('\n');
-}
-
-int Kernel::Open(char *filename)
-{
-    OpenFile* file = fileSystem->Open(filename);
-    if(file == NULL) return -1;
-    return (int)(file);
-}
-
-int Kernel::Write(char* buffer , int size , int id)
-{
-    OpenFile* file = (OpenFile*) id;
-    for(int i=0 ; i < fileSystem->openFileTableTop ; i++)
-        if(fileSystem->openFileTable[i] == file)
-            return file->Write(buffer, size);
-    return -1;
-}
-
-int Kernel::Read(char* buffer , int size , int id)
-{
-    OpenFile* file = (OpenFile*) id;
-    for(int i=0 ; i < fileSystem->openFileTableTop ; i++)
-        if(fileSystem->openFileTable[i] == file)
-            return file->Read(buffer, size);
-    return -1;
-}
-
-int Kernel::Close(int id)
-{
-    OpenFile* file = (OpenFile*) id;
-    for(int i=0 ; i < fileSystem->openFileTableTop ; i++)
-    {
-        if(fileSystem->openFileTable[i] == file)
-        {
-            fileSystem->openFileTable[i] = fileSystem->openFileTable[fileSystem->openFileTableTop-1];
-            fileSystem->openFileTableTop--;
-            delete file;
-            return 1;
-        }
-    }
-    return 0;
-}

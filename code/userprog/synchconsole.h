@@ -24,6 +24,8 @@ class SynchConsoleInput : public CallBackObj {
   public:
     SynchConsoleInput(char *inputFile); // Initialize the console device
     ~SynchConsoleInput();		// Deallocate console device
+	
+	void Disable() { consoleInput->Disable(); }// 2015.11.25
 
     char GetChar();		// Read a character, waiting if necessary
     

@@ -72,6 +72,14 @@ class Directory {
 					//  names and their contents.
 
   private:
+  
+	/*
+		MP4 Hint:
+		Directory is actually a "file", be careful of how it works with OpenFile and FileHdr.
+		Disk part: table
+		In-core part: tableSize
+	*/
+  
     int tableSize;			// Number of directory entries
     DirectoryEntry *table;		// Table of pairs: 
 					// <file name, file header location> 

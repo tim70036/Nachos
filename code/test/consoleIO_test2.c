@@ -1,10 +1,13 @@
 #include "syscall.h"
 
-int main()
+int
+main()
 {
-	int n=0,i;
-	for(i=0 ; i < 10000 ; i++)
-    {
-        n += i;
-    }
+	int n;
+	for (n=15;n<=19;n++){
+        
+		PrintInt(n);
+        }
+        Halt();
 }
+

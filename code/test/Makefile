@@ -113,7 +113,8 @@ PROGRAMS = unknownhost
 else
 # change this if you create a new test program!
 #PROGRAMS = add halt shell matmult sort segments test1 test2 a
-PROGRAMS = add halt consoleIO_test1 consoleIO_test2 fileIO_test1 fileIO_test2
+#PROGRAMS = add halt consoleIO_test1 consoleIO_test2 fileIO_test1 fileIO_test2
+PROGRAMS = FS_test1 FS_test2
 endif
 
 all: $(PROGRAMS)
@@ -181,6 +182,18 @@ fileIO_test2.o: fileIO_test2.c
 fileIO_test2: fileIO_test2.o start.o
 	$(LD) $(LDFLAGS) start.o fileIO_test2.o -o fileIO_test2.coff
 	$(COFF2NOFF) fileIO_test2.coff fileIO_test2
+
+FS_test1.o: FS_test1.c
+	$(CC) $(CFLAGS) -c FS_test1.c
+FS_test1: FS_test1.o start.o
+	$(LD) $(LDFLAGS) start.o FS_test1.o -o FS_test1.coff
+	$(COFF2NOFF) FS_test1.coff FS_test1
+
+FS_test2.o: FS_test2.c
+	$(CC) $(CFLAGS) -c FS_test2.c
+FS_test2: FS_test2.o start.o
+	$(LD) $(LDFLAGS) start.o FS_test2.o -o FS_test2.coff
+	$(COFF2NOFF) FS_test2.coff FS_test2
 
 
 

@@ -37,6 +37,10 @@
 
 class FileHeader {
   public:
+	// MP4 mod tag
+	FileHeader(); // dummy constructor to keep valgrind happy
+	~FileHeader();
+	
     bool Allocate(PersistentBitmap *bitMap, int fileSize);// Initialize a file header, 
 						//  including allocating space 
 						//  on disk for the file data
@@ -57,6 +61,22 @@ class FileHeader {
     void Print();			// Print the contents of the file.
 
   private:
+	
+	/*
+		MP4 hint:
+		You will need a data structure to store more information in a header.
+		Fields in a class can be separated into disk part and in-core part.
+		Disk part are data that will be written into disk.
+		In-core part are data only lies in memory, and are used to maintain the data structure of this class.
+		In order to implement a data structure, you will need to add some "in-core" data
+		to maintain data structure.
+		
+		Disk Part - numBytes, numSectors, dataSectors occupy exactly 128 bytes and will be
+		written to a sector on disk.
+		In-core part - none
+		
+	*/
+	
     int numBytes;			// Number of bytes in the file
     int numSectors;			// Number of data sectors in the file
     int dataSectors[NumDirect];		// Disk sector numbers for each data 

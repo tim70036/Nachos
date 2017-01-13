@@ -1,4 +1,4 @@
-// interrupt.h
+// interrupt.h 
 //	Data structures to emulate low-level interrupt hardware.
 //
 //	The hardware provides a routine (SetLevel) to enable or disable
@@ -6,17 +6,17 @@
 //
 //	In order to emulate the hardware, we need to keep track of all
 //	interrupts the hardware devices would cause, and when they
-//	are supposed to occur.
+//	are supposed to occur.  
 //
 //	This module also keeps track of simulated time.  Time advances
-//	only when the following occur:
+//	only when the following occur: 
 //		interrupts are re-enabled
 //		a user instruction is executed
 //		there is nothing in the ready queue
 //
-//	As a result, unlike real hardware, interrupts (and thus time-slice
+//	As a result, unlike real hardware, interrupts (and thus time-slice 
 //	context switches) cannot occur anywhere in the code where interrupts
-//	are enabled, but rather only at those places in the code where
+//	are enabled, but rather only at those places in the code where 
 //	simulated time advances (so that it becomes time to invoke an
 //	interrupt in the hardware simulation).
 //
@@ -27,7 +27,7 @@
 //  DO NOT CHANGE -- part of the machine emulation
 //
 // Copyright (c) 1992-1996 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation
+// All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
 #ifndef INTERRUPT_H
@@ -41,14 +41,14 @@
 enum IntStatus { IntOff, IntOn };
 
 // Nachos can be running kernel code (SystemMode), user code (UserMode),
-// or there can be no runnable thread, because the ready list
+// or there can be no runnable thread, because the ready list 
 // is empty (IdleMode).
 enum MachineStatus {IdleMode, SystemMode, UserMode};
 
 // IntType records which hardware device generated an interrupt.
 // In Nachos, we support a hardware timer device, a disk, a console
 // display and keyboard, and a network.
-enum IntType { TimerInt, DiskInt, ConsoleWriteInt, ConsoleReadInt,
+enum IntType { TimerInt, DiskInt, ConsoleWriteInt, ConsoleReadInt, 
 			NetworkSendInt, NetworkRecvInt};
 
 // The following class defines an interrupt that is scheduled
@@ -63,7 +63,7 @@ class PendingInterrupt {
 
     CallBackObj *callOnInterrupt;// The object (in the hardware device
 				// emulator) to call when the interrupt occurs
-
+    
     int when;			// When the interrupt is supposed to fire
     IntType type;		// for debugging
 };
@@ -77,9 +77,9 @@ class Interrupt {
   public:
     Interrupt();		// initialize the interrupt simulation
     ~Interrupt();		// de-allocate data structures
-
+    
     IntStatus SetLevel(IntStatus level);
-    				// Disable or enable interrupts
+    				// Disable or enable interrupts 
 				// and return previous setting.
 
     void Enable() { (void) SetLevel(IntOn); }
@@ -87,24 +87,27 @@ class Interrupt {
     IntStatus getLevel() {return level;}
     				// Return whether interrupts
 				// are enabled or disabled
-
-    void Idle(); 		// The ready queue is empty, roll
-				// simulated time forward until the
+    
+    void Idle(); 		// The ready queue is empty, roll 
+				// simulated time forward until the 
 				// next interrupt
 
     void Halt(); 		// quit and print out stats
 
+    void PrintInt(int number);
+	#ifdef FILESYS_STUB
 	int CreateFile(char *filename);
+	#endif 
 
-    void YieldOnReturn();	// cause a context switch on return
+    void YieldOnReturn();	// cause a context switch on return 
 				// from an interrupt handler
 
-    MachineStatus getStatus() { return status; }
+    MachineStatus getStatus() { return status; } 
     void setStatus(MachineStatus st) { status = st; }
         			// idle, kernel, user
 
     void DumpState();		// Print interrupt state
-
+    
 
     // NOTE: the following are internal to the hardware simulation code.
     // DO NOT call these directly.  I should make them "private",
@@ -115,19 +118,12 @@ class Interrupt {
     				// Schedule an interrupt to occur
 				// at time "when".  This is called
     				// by the hardware device simulators.
-
+    
     void OneTick();       	// Advance simulated time
-
-	/* MP1 */
-	void PrintInt(int n);
-	int Open(char *filename);
-	int Write(char* buffer , int size , int id);
-	int Read(char* buffer , int size , int id);
-	int Close(int id);
 
   private:
     IntStatus level;		// are interrupts enabled or disabled?
-    SortedList<PendingInterrupt *> *pending;
+    SortedList<PendingInterrupt *> *pending;		
     				// the list of interrupts scheduled
 				// to occur in the future
     //int writeFileNo;            //UNIX file emulating the display
@@ -140,14 +136,12 @@ class Interrupt {
 
     // these functions are internal to the interrupt simulation code
 
-    bool CheckIfDue(bool advanceClock);
+    bool CheckIfDue(bool advanceClock); 
     				// Check if any interrupts are supposed
 				// to occur now, and if so, do them
 
     void ChangeLevel(IntStatus old, 	// SetLevel, without advancing the
 			IntStatus now); // simulated time
-
-
 };
 
 #endif // INTERRRUPT_H
