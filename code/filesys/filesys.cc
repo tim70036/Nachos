@@ -253,7 +253,7 @@ FileSystem::Open(char *name)
     if (sector >= 0)
     {
         openFile = new OpenFile(sector);	// name was found in directory
-        openFileTable[openFileTableTop++] = opened;
+        openFileTable[openFileTableTop++] = openFile;
     }
 
     delete directory;

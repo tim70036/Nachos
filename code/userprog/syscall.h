@@ -39,10 +39,10 @@
 
 
 /* MP1 */
-#define SC_Open 8787
-#define SC_Write 9487
-#define SC_Read	 5487
-#define SC_Close    168
+#define SC_Open 6
+#define SC_Write 8
+#define SC_Read	 7
+#define SC_Close  10
 
 #ifndef IN_ASM
 

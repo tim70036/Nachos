@@ -392,5 +392,5 @@ int Interrupt::Close(int id)
 /* MP4 */
 int	Interrupt::CreateFile(char *filename, int size)
 {
-    return kernel->CreateFile(filename, int size);
+    return kernel->CreateFile(filename, size);
 }
