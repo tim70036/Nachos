@@ -1,4 +1,4 @@
-// interrupt.cc 
+// interrupt.cc
 //	Routines to simulate hardware interrupts.
 //
 //	The hardware provides a routine (SetLevel) to enable or disable
@@ -6,10 +6,10 @@
 //
 //	In order to emulate the hardware, we need to keep track of all
 //	interrupts the hardware devices would cause, and when they
-//	are supposed to occur.  
+//	are supposed to occur.
 //
 //	This module also keeps track of simulated time.  Time advances
-//	only when the following occur: 
+//	only when the following occur:
 //		interrupts are re-enabled
 //		a user instruction is executed
 //		there is nothing in the ready queue
@@ -17,7 +17,7 @@
 //  DO NOT CHANGE -- part of the machine emulation
 //
 // Copyright (c) 1992-1996 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
+// All rights reserved.  See copyright.h for copyright notice and limitation
 // of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
@@ -27,13 +27,13 @@
 // String definitions for debugging messages
 
 static char *intLevelNames[] = { "off", "on"};
-static char *intTypeNames[] = { "timer", "disk", "console write", 
-			"console read", "network send", 
+static char *intTypeNames[] = { "timer", "disk", "console write",
+			"console read", "network send",
 			"network recv"};
 
 //----------------------------------------------------------------------
 // PendingInterrupt::PendingInterrupt
-// 	Initialize a hardware device interrupt that is to be scheduled 
+// 	Initialize a hardware device interrupt that is to be scheduled
 //	to occur in the near future.
 //
 //	"callOnInt" is the object to call when the interrupt occurs
@@ -41,7 +41,7 @@ static char *intTypeNames[] = { "timer", "disk", "console write",
 //	"kind" is the hardware device that generated the interrupt
 //----------------------------------------------------------------------
 
-PendingInterrupt::PendingInterrupt(CallBackObj *callOnInt, 
+PendingInterrupt::PendingInterrupt(CallBackObj *callOnInt,
 					int time, IntType kind)
 {
     callOnInterrupt = callOnInt;
@@ -65,7 +65,7 @@ PendingCompare (PendingInterrupt *x, PendingInterrupt *y)
 //----------------------------------------------------------------------
 // Interrupt::Interrupt
 // 	Initialize the simulation of hardware device interrupts.
-//	
+//
 //	Interrupts start disabled, with no interrupts pending, etc.
 //----------------------------------------------------------------------
 
@@ -93,7 +93,7 @@ Interrupt::~Interrupt()
 
 //----------------------------------------------------------------------
 // Interrupt::ChangeLevel
-// 	Change interrupts to be enabled or disabled, without advancing 
+// 	Change interrupts to be enabled or disabled, without advancing
 //	the simulated time (normally, enabling interrupts advances the time).
 //
 //	Used internally.
@@ -124,7 +124,7 @@ IntStatus
 Interrupt::SetLevel(IntStatus now)
 {
     IntStatus old = level;
-    
+
     // interrupt handlers are prohibited from enabling interrupts
     ASSERT((now == IntOff) || (inHandler == FALSE));
 
@@ -137,8 +137,8 @@ Interrupt::SetLevel(IntStatus now)
 
 //----------------------------------------------------------------------
 // Interrupt::OneTick
-// 	Advance simulated time and check if there are any pending 
-//	interrupts to be called. 
+// 	Advance simulated time and check if there are any pending
+//	interrupts to be called.
 //
 //	Two things can cause OneTick to be called:
 //		interrupts are re-enabled
@@ -166,7 +166,7 @@ Interrupt::OneTick()
 				// interrupts disabled)
     CheckIfDue(FALSE);		// check for pending interrupts
     ChangeLevel(IntOff, IntOn);	// re-enable interrupts
-    if (yieldOnReturn) {	// if the timer device handler asked 
+    if (yieldOnReturn) {	// if the timer device handler asked
     				// for a context switch, ok to do it now
 	yieldOnReturn = FALSE;
  	status = SystemMode;		// yield is a kernel routine
@@ -182,15 +182,15 @@ Interrupt::OneTick()
 //	when the handler returns.
 //
 //	We can't do the context switch here, because that would switch
-//	out the interrupt handler, and we want to switch out the 
+//	out the interrupt handler, and we want to switch out the
 //	interrupted thread.
 //----------------------------------------------------------------------
 
 void
 Interrupt::YieldOnReturn()
-{ 
-    ASSERT(inHandler == TRUE);  
-    yieldOnReturn = TRUE; 
+{
+    ASSERT(inHandler == TRUE);
+    yieldOnReturn = TRUE;
 }
 
 //----------------------------------------------------------------------
@@ -198,7 +198,7 @@ Interrupt::YieldOnReturn()
 // 	Routine called when there is nothing in the ready queue.
 //
 //	Since something has to be running in order to put a thread
-//	on the ready queue, the only thing to do is to advance 
+//	on the ready queue, the only thing to do is to advance
 //	simulated time until the next scheduled hardware interrupt.
 //
 //	If there are no pending interrupts, stop.  There's nothing
@@ -216,7 +216,7 @@ Interrupt::Idle()
     }
 
     // if there are no pending interrupts, and nothing is on the ready
-    // queue, it is time to stop.   If the console or the network is 
+    // queue, it is time to stop.   If the console or the network is
     // operating, there are *always* pending interrupts, so this code
     // is not reached.  Instead, the halt must be invoked by the user program.
 
@@ -243,7 +243,7 @@ Interrupt::Halt()
     kernel->stats->Print();
 	*/
 	delete debug;
-	
+
     delete kernel;	// Never returns.
 }
 
@@ -266,7 +266,7 @@ Interrupt::CreateFile(char *filename)
 //	Instead, it is only called by the hardware device simulators.
 //
 //	"toCall" is the object to call when the interrupt occurs
-//	"fromNow" is how far in the future (in simulated time) the 
+//	"fromNow" is how far in the future (in simulated time) the
 //		 interrupt is to occur
 //	"type" is the hardware device that generated the interrupt
 //----------------------------------------------------------------------
@@ -284,14 +284,14 @@ Interrupt::Schedule(CallBackObj *toCall, int fromNow, IntType type)
 
 //----------------------------------------------------------------------
 // Interrupt::CheckIfDue
-// 	Check if any interrupts are scheduled to occur, and if so, 
+// 	Check if any interrupts are scheduled to occur, and if so,
 //	fire them off.
 //
 // Returns:
 //	TRUE, if we fired off any interrupt handlers
 // Params:
 //	"advanceClock" -- if TRUE, there is nothing in the ready queue,
-//		so we should simply advance the clock to when the next 
+//		so we should simply advance the clock to when the next
 //		pending interrupt would occur (if any).
 //----------------------------------------------------------------------
 bool
@@ -306,8 +306,8 @@ Interrupt::CheckIfDue(bool advanceClock)
 	DumpState();
     }
     if (pending->IsEmpty()) {   	// no pending interrupts
-	return FALSE;	
-    }		
+	return FALSE;
+    }
     next = pending->Front();
 
     if (next->when > stats->totalTicks) {
@@ -333,7 +333,7 @@ Interrupt::CheckIfDue(bool advanceClock)
         next = pending->RemoveFront();    // pull interrupt off list
         next->callOnInterrupt->CallBack();// call the interrupt handler
 	delete next;
-    } while (!pending->IsEmpty() 
+    } while (!pending->IsEmpty()
     		&& (pending->Front()->when <= stats->totalTicks));
     inHandler = FALSE;
     return TRUE;
@@ -368,3 +368,29 @@ Interrupt::DumpState()
     cout << "\nEnd of pending interrupts\n";
 }
 
+/* MP1 */
+int Interrupt::Open(char *filename)
+{
+	return kernel->Open(filename);
+}
+
+int Interrupt::Write(char* buffer , int size , int id)
+{
+	return kernel->Write(buffer, size, id);
+}
+
+int Interrupt::Read(char* buffer , int size , int id)
+{
+	return kernel->Read(buffer, size, id);
+}
+
+int Interrupt::Close(int id)
+{
+	return kernel->Close(id);
+}
+
+/* MP4 */
+int	Interrupt::CreateFile(char *filename, int size)
+{
+    return kernel->CreateFile(filename, int size);
+}

@@ -1,12 +1,12 @@
-// filehdr.h 
-//	Data structures for managing a disk file header.  
+// filehdr.h
+//	Data structures for managing a disk file header.
 //
 //	A file header describes where on disk to find the data in a file,
 //	along with other information about the file (for instance, its
 //	length, owner, etc.)
 //
 // Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
+// All rights reserved.  See copyright.h for copyright notice and limitation
 // of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
@@ -17,13 +17,16 @@
 #include "disk.h"
 #include "pbitmap.h"
 
-#define NumDirect 	((SectorSize - 2 * sizeof(int)) / sizeof(int))
-#define MaxFileSize 	(NumDirect * SectorSize)
+#define NumDirect 	((SectorSize - 3 * sizeof(int)) / sizeof(int))
+/* MP4 -3 is for numBytes, numSectors, nextFileHeaderSector to store in one sector */
 
-// The following class defines the Nachos "file header" (in UNIX terms,  
+#define MaxFileSize 	(NumDirect * SectorSize)
+// MP4 the max file size : SectorSize - (space for numBytes and numSectors) = numbers of data block pointer * int size
+
+// The following class defines the Nachos "file header" (in UNIX terms,
 // the "i-node"), describing where on disk to find all of the data in the file.
 // The file header is organized as a simple table of pointers to
-// data blocks. 
+// data blocks.
 //
 // The file header data structure can be stored in memory or on disk.
 // When it is on disk, it is stored in a single sector -- this means
@@ -38,13 +41,13 @@
 class FileHeader {
   public:
 	// MP4 mod tag
-	FileHeader(); // dummy constructor to keep valgrind happy
+	FileHeader(); // dummy constructor to keep valgrind happy // Then, can you keep LazyShout and Azure happy?
 	~FileHeader();
-	
-    bool Allocate(PersistentBitmap *bitMap, int fileSize);// Initialize a file header, 
-						//  including allocating space 
+
+    bool Allocate(PersistentBitmap *bitMap, int fileSize);// Initialize a file header,
+						//  including allocating space
 						//  on disk for the file data
-    void Deallocate(PersistentBitmap *bitMap);  // De-allocate this file's 
+    void Deallocate(PersistentBitmap *bitMap);  // De-allocate this file's
 						//  data blocks
 
     void FetchFrom(int sectorNumber); 	// Initialize file header from disk
@@ -55,13 +58,13 @@ class FileHeader {
 					// to the disk sector containing
 					// the byte
 
-    int FileLength();			// Return the length of the file 
+    int FileLength();			// Return the length of the file
 					// in bytes
 
     void Print();			// Print the contents of the file.
 
   private:
-	
+
 	/*
 		MP4 hint:
 		You will need a data structure to store more information in a header.
@@ -70,17 +73,24 @@ class FileHeader {
 		In-core part are data only lies in memory, and are used to maintain the data structure of this class.
 		In order to implement a data structure, you will need to add some "in-core" data
 		to maintain data structure.
-		
+
 		Disk Part - numBytes, numSectors, dataSectors occupy exactly 128 bytes and will be
 		written to a sector on disk.
 		In-core part - none
-		
+
 	*/
-	
+
+
+
     int numBytes;			// Number of bytes in the file
     int numSectors;			// Number of data sectors in the file
-    int dataSectors[NumDirect];		// Disk sector numbers for each data 
+    int dataSectors[NumDirect];		// Disk sector numbers for each data
 					// block in the file
+
+
+    /* MP4 */
+    FileHeader* nextFileHeader; /* in core */
+    int nextFileHeaderSector;/* on disk */
 };
 
 #endif // FILEHDR_H
