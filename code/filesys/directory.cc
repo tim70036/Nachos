@@ -164,7 +164,7 @@ bool    Directory::Add(char *name, int newSector, bool isDir)
 	}
     return FALSE;	// no space.  Fix when we have extensible files.
 }
-}
+
 
 //----------------------------------------------------------------------
 // Directory::Remove
@@ -201,7 +201,7 @@ Directory::List(bool recursive, int depth)
         /* Better format , support recursive list*/
         if (table[i].inUse)
   	    {
-            for(int j = 0 ; j < depth ; j++)    printf(">__< >__< >__<")   
+            for(int j = 0 ; j < depth ; j++)    printf(">__< >__< >__<")
 
             printf("<%d>    ",num);
             printf("%s  ", table[i].name);

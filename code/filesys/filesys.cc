@@ -52,6 +52,7 @@
 #include "filehdr.h"
 #include "filesys.h"
 #include <string.h>
+#include "filesys.cc"
 
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known
@@ -421,7 +422,7 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
         if(nextCut != NULL) /* Go deeper */
         {
             /* Does sub-directory exist? */
-            sector = curDirectory->Find(cut);
+            int sector = curDirectory->Find(cut);
             if(sector == -1)
             {
                 delete curDirectory;
