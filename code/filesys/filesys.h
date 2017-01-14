@@ -77,20 +77,22 @@ class FileSystem {
 	// MP4 mod tag
 	~FileSystem();
 
-    bool Create(char *name, int initialSize);
+    bool Create(char *name, int initialSize, bool isDir); /* MP4 */
 					// Create a file (UNIX creat)
 
     OpenFile* Open(char *name); 	// Open a file (UNIX open)
 
     bool Remove(char *name);  		// Delete a file (UNIX unlink)
 
-    void List();			// List all the files in the file system
+    /* MP4 */
+    void List(bool recursive);			// List all the files in the file system
 
     void Print();			// List all the files and their contents
 
     /* MP4 */
     OpenFile *openFileTable[487];
     int openFileTableTop;
+    OpenFile* FindSubDirectory(char* name);
 
 
   private:

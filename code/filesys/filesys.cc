@@ -51,6 +51,7 @@
 #include "directory.h"
 #include "filehdr.h"
 #include "filesys.h"
+#include <string.h>
 
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known
@@ -62,7 +63,7 @@
 // supports extensible files, the directory size sets the maximum number
 // of files that can be loaded onto the disk.
 #define FreeMapFileSize 	(NumSectors / BitsInByte)
-#define NumDirEntries 		10
+#define NumDirEntries 		64 /* MP4 */
 #define DirectoryFileSize 	(sizeof(DirectoryEntry) * NumDirEntries)
 
 //----------------------------------------------------------------------
@@ -182,9 +183,8 @@ FileSystem::~FileSystem()
 //----------------------------------------------------------------------
 
 bool
-FileSystem::Create(char *name, int initialSize)
+FileSystem::Create(char *name, int initialSize, bool isDir)
 {
-    Directory *directory;
     PersistentBitmap *freeMap;
     FileHeader *hdr;
     int sector;
@@ -192,8 +192,13 @@ FileSystem::Create(char *name, int initialSize)
 
     DEBUG(dbgFile, "Creating file " << name << " size " << initialSize);
 
-    directory = new Directory(NumDirEntries);
-    directory->FetchFrom(directoryFile);
+    /* MP4 */
+    /* Find the directory containing the target file */
+    OpenFile* curDirFile = FindSubDirectory(name);
+    if(curDirFile == NULL)  return FALSE; /* Directory file not found */
+    Directory *directory = new Directory(NumDirEntries);
+    directory->FetchFrom(curDirFile);
+
 
     if (directory->Find(name) != -1)
       success = FALSE;			// file is already in directory
@@ -202,7 +207,7 @@ FileSystem::Create(char *name, int initialSize)
         sector = freeMap->FindAndSet();	// find a sector to hold the file header
     	if (sector == -1)
             success = FALSE;		// no free block for file header
-        else if (!directory->Add(name, sector))
+        else if (!directory->Add(name, sector, isDir)) /* MP4 */ /* isDir */
             success = FALSE;	// no space in directory
 	    else
         {
@@ -214,13 +219,18 @@ FileSystem::Create(char *name, int initialSize)
     	    	success = TRUE;
     		// everthing worked, flush all changes back to disk
         	    	hdr->WriteBack(sector);
-        	    	directory->WriteBack(directoryFile);
+        	    	directory->WriteBack(curDirFile); /* MP4 */ /* write back to dir */
         	    	freeMap->WriteBack(freeMapFile);
 	        }
             delete hdr;
 	    }
         delete freeMap;
     }
+
+    /* MP4 */
+    /* Don't delete root directoryFile */
+    if(curDirFile != directoryFile && curDirFile != NULL) delete curDirFile;
+
     delete directory;
     return success;
 }
@@ -238,12 +248,18 @@ FileSystem::Create(char *name, int initialSize)
 OpenFile *
 FileSystem::Open(char *name)
 {
-    Directory *directory = new Directory(NumDirEntries);
     OpenFile *openFile = NULL;
     int sector;
 
+    /* MP4 */
+    /* Find the directory containing the target file */
+    OpenFile* curDirFile = FindSubDirectory(name);
+    if(curDirFile == NULL)  return NULL; /* Directory file not found , return NULL */
+    Directory *directory = new Directory(NumDirEntries);
+    directory->FetchFrom(curDirFile);
+
+
     DEBUG(dbgFile, "Opening file" << name);
-    directory->FetchFrom(directoryFile);
     sector = directory->Find(name);
 
     /* MP4 */
@@ -255,6 +271,10 @@ FileSystem::Open(char *name)
         openFile = new OpenFile(sector);	// name was found in directory
         openFileTable[openFileTableTop++] = openFile;
     }
+
+    /* MP4 */
+    /* Don't delete root directoryFile */
+    if(curDirFile != directoryFile && curDirFile != NULL) delete curDirFile;
 
     delete directory;
     return openFile;				// return NULL if not found
@@ -277,17 +297,28 @@ FileSystem::Open(char *name)
 bool
 FileSystem::Remove(char *name)
 {
-    Directory *directory;
     PersistentBitmap *freeMap;
     FileHeader *fileHdr;
     int sector;
 
-    directory = new Directory(NumDirEntries);
-    directory->FetchFrom(directoryFile);
+    /* MP4 */
+    /* Find the directory containing the target file */
+    OpenFile* curDirFile = FindSubDirectory(name);
+    if(curDirFile == NULL)  return FALSE; /* Directory file not found */
+    Directory *directory = new Directory(NumDirEntries);
+    directory->FetchFrom(curDirFile);
+
+
     sector = directory->Find(name);
-    if (sector == -1) {
-       delete directory;
-       return FALSE;			 // file not found
+    // file not found
+    if (sector == -1)
+    {
+        /* MP4 */
+        /* Don't delete root directoryFile */
+        if(curDirFile != directoryFile && curDirFile != NULL) delete curDirFile;
+
+        delete directory;
+        return FALSE;
     }
     fileHdr = new FileHeader;
     fileHdr->FetchFrom(sector);
@@ -299,7 +330,12 @@ FileSystem::Remove(char *name)
     directory->Remove(name);
 
     freeMap->WriteBack(freeMapFile);		// flush to disk
-    directory->WriteBack(directoryFile);        // flush to disk
+    directory->WriteBack(curDirFile); /* MP4 write to curDirFile */
+
+    /* MP4 */
+    /* Don't delete root directoryFile */
+    if(curDirFile != directoryFile && curDirFile != NULL) delete curDirFile;
+
     delete fileHdr;
     delete directory;
     delete freeMap;
@@ -312,12 +348,12 @@ FileSystem::Remove(char *name)
 //----------------------------------------------------------------------
 
 void
-FileSystem::List()
+FileSystem::List(bool recursive)
 {
     Directory *directory = new Directory(NumDirEntries);
 
     directory->FetchFrom(directoryFile);
-    directory->List();
+    directory->List(recursive, 0);
     delete directory;
 }
 
@@ -356,6 +392,54 @@ FileSystem::Print()
     delete dirHdr;
     delete freeMap;
     delete directory;
+}
+
+
+/* MP4 */
+/* Find the sub-directory */
+OpenFile* FileSystem::FindSubDirectory(char* name)
+{
+    Directory *curDirectory = new Directory(NumDirEntries);
+    OpenFile*  curDirFile = directoryFile; /* root file */
+    curDirectory->FetchFrom(curDirFile);
+
+    char* prevCut = NULL;
+    char* cut = strtok(name, "/");
+
+    if(cut == NULL)
+    {
+        delete curDirectory;
+        return NULL:
+    }
+
+    while(1)
+    {
+        char *nextCut = strtok(NULL, "/");
+        if(nextCut != NULL) /* Go deeper */
+        {
+            /* Does sub-directory exist? */
+            sector = curDirectory->Find(cut);
+            if(sector == -1)
+            {
+                delete curDirectory;
+                return NULL;
+            }
+
+            /* Deeper !!!! */
+            if(curDirFile != directoryFile) delete curDirFile; /* Don;t del root file */
+            curDirFile = new OpenFile(sector);
+            curDirectory->FetchFrom(curDirFile);
+
+            prevCut = cut;
+            cut = nextCut;
+        }
+        /* In the end */
+        else
+        {
+            delete curDirectory;
+            return curDirFile;
+        }
+    }
 }
 
 #endif // FILESYS_STUB

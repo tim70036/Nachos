@@ -381,5 +381,5 @@ int Kernel::Close(int id)
 /* MP4 */
 int Kernel::CreateFile(char *filename, int size)
 {
-	return fileSystem->Create(filename, size);
+	return fileSystem->Create(filename, size, FALSE);
 }
