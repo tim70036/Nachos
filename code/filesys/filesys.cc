@@ -190,6 +190,9 @@ FileSystem::Create(char *name, int initialSize, bool isDir)
     int sector;
     bool success;
 
+    /* MP4 */ /* DirectoryFileSize */
+    if(isDir)   initialSize = DirectoryFileSize;
+
     DEBUG(dbgFile, "Creating file " << name << " size " << initialSize);
 
     /* MP4 */
