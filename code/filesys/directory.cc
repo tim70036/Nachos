@@ -23,6 +23,7 @@
 #include "utility.h"
 #include "filehdr.h"
 #include "directory.h"
+#include "filesys.cc"
 
 //----------------------------------------------------------------------
 // Directory::Directory
@@ -201,7 +202,7 @@ Directory::List(bool recursive, int depth)
         /* Better format , support recursive list*/
         if (table[i].inUse)
   	    {
-            for(int j = 0 ; j < depth ; j++)    printf(">__< >__< >__<")
+            for(int j = 0 ; j < depth ; j++)    printf(">__< >__< >__<");
 
             printf("<%d>    ",num);
             printf("%s  ", table[i].name);

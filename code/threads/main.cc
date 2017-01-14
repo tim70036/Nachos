@@ -45,8 +45,6 @@
 #include "filesys.h"
 #include "openfile.h"
 #include "sysdep.h"
-#include "filesys.cc"
-
 
 // global variables
 Kernel *kernel;
@@ -159,7 +157,7 @@ CreateDirectory(char *name)
 {
     /* MP4 */
     /* Creating Dir is same as creating a file */
-    kernel->fileSystem->Create(name, DirectoryFileSize, TRUE);
+    kernel->fileSystem->Create(name, 0, TRUE);
 }
 
 //----------------------------------------------------------------------
