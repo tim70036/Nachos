@@ -44,9 +44,6 @@
 // of liability and disclaimer of warranty provisions.
 #ifndef FILESYS_STUB
 
-#ifndef FUCK
-#define FUCK
-
 #include "copyright.h"
 #include "debug.h"
 #include "disk.h"
@@ -62,12 +59,6 @@
 #define FreeMapSector 		0
 #define DirectorySector 	1
 
-// Initial file sizes for the bitmap and directory; until the file system
-// supports extensible files, the directory size sets the maximum number
-// of files that can be loaded onto the disk.
-#define FreeMapFileSize 	(NumSectors / BitsInByte)
-#define NumDirEntries 		64 /* MP4 */
-#define DirectoryFileSize 	(sizeof(DirectoryEntry) * NumDirEntries)
 
 //----------------------------------------------------------------------
 // FileSystem::FileSystem
@@ -447,7 +438,5 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
         }
     }
 }
-
-#endif // FUCK
 
 #endif // FILESYS_STUB

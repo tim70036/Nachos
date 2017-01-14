@@ -23,7 +23,7 @@
 #include "utility.h"
 #include "filehdr.h"
 #include "directory.h"
-#include "filesys.cc"
+#include "filesys.h"
 
 //----------------------------------------------------------------------
 // Directory::Directory
