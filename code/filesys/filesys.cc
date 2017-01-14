@@ -397,10 +397,10 @@ FileSystem::Print()
 OpenFile* FileSystem::FindSubDirectory(char* name)
 {
     Directory *curDirectory = new Directory(NumDirEntries);
+    OpenFile* prevDirFile = NULL:
     OpenFile*  curDirFile = directoryFile; /* root file */
     curDirectory->FetchFrom(curDirFile);
 
-    char* prevCut = NULL;
     char* cut = strtok(name, "/");
 
     if(cut == NULL)
@@ -419,22 +419,24 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
             if(sector == -1)
             {
                 delete curDirectory;
+                if(curDirFile != directoryFile) delete curDirFile; /* Don;t del root file */
                 return NULL;
             }
 
             /* Deeper !!!! */
+            prevDirFile = curDirFile;
             if(curDirFile != directoryFile) delete curDirFile; /* Don;t del root file */
             curDirFile = new OpenFile(sector);
             curDirectory->FetchFrom(curDirFile);
 
-            prevCut = cut;
             cut = nextCut;
         }
         /* In the end */
         else
         {
             delete curDirectory;
-            return curDirFile;
+            if(curDirFile != directoryFile) delete curDirFile; /* Don;t del root file */
+            return prevDirFile;
         }
     }
 }
