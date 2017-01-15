@@ -204,7 +204,7 @@ Directory::List(bool recursive, int depth)
   	    {
             for(int j = 0 ; j < depth ; j++)    printf("    ");
 
-            printf("<%d>    ",num);
+            printf("%d.",num);
             printf("%s  ", table[i].name);
             if(table[i].isDir)
             {
