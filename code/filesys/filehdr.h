@@ -44,7 +44,7 @@ class FileHeader {
 	FileHeader(); // dummy constructor to keep valgrind happy // Then, can you keep LazyShout and Azure happy?
 	~FileHeader();
 
-    bool Allocate(PersistentBitmap *bitMap, int fileSize);// Initialize a file header,
+    int Allocate(PersistentBitmap *bitMap, int fileSize);// Initialize a file header,
 						//  including allocating space
 						//  on disk for the file data
     void Deallocate(PersistentBitmap *bitMap);  // De-allocate this file's

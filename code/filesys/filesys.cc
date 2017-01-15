@@ -215,11 +215,19 @@ FileSystem::Create(char *pathName, int initialSize, bool isDir)
 	    else
         {
         	hdr = new FileHeader;
-    	    if (!hdr->Allocate(freeMap, initialSize))
+
+            /* MP4 */
+            /* Calculate the total size of all headers for this file */
+            int totalSize = hdr->Allocate(freeMap, initialSize);
+
+    	    if (totalSize <= 0)
                 	success = FALSE;	// no space on disk for data
     	    else
             {
-    	    	    success = TRUE;
+                    /* Output the totalSize */
+                    printf("Successfully allocated, total headers' size [%d bytes]\n",totalSize);
+
+                    success = TRUE;
     		        // everthing worked, flush all changes back to disk
         	    	hdr->WriteBack(sector);
         	    	directory->WriteBack(curDirFile); /* MP4 */ /* write back to dir */

@@ -28,7 +28,7 @@
 #include "debug.h"
 #include "synchdisk.h"
 #include "main.h"
-
+#include "disk.h"
 //----------------------------------------------------------------------
 // MP4 mod tag
 // FileHeader::FileHeader
@@ -72,8 +72,8 @@ FileHeader::~FileHeader()
 //	"fileSize" is the bit map of free disk sectors
 //----------------------------------------------------------------------
 
-bool
-FileHeader::Allocate(PersistentBitmap *freeMap, int fileSize)
+/* MP4 */
+int	FileHeader::Allocate(PersistentBitmap *freeMap, int fileSize)
 {
 	/* MP4 */
 	/* How much data bytes this header has? */
@@ -83,10 +83,9 @@ FileHeader::Allocate(PersistentBitmap *freeMap, int fileSize)
 	else  /* We need next header */
 		numBytes = MaxFileSize;
 
-
     numSectors  = divRoundUp(numBytes, SectorSize);
     if (freeMap->NumClear() < numSectors)
-	return FALSE;		// not enough space
+		return 0;		// not enough space
 
     for (int i = 0; i < numSectors; i++)
 	{
@@ -99,7 +98,7 @@ FileHeader::Allocate(PersistentBitmap *freeMap, int fileSize)
 		/* Clean this sector */
 		char tmp[SectorSize];	for(int i=0 ; i<SectorSize ; i++)	tmp[i] = 0;
 		kernel->synchDisk->WriteSector(dataSectors[i], tmp);
-		
+
 
     }
 
@@ -112,10 +111,10 @@ FileHeader::Allocate(PersistentBitmap *freeMap, int fileSize)
 		if(nextFileHeaderSector == -1)	return FALSE;
 
 		nextFileHeader = new FileHeader;
-		return nextFileHeader->Allocate(freeMap, remainFileSize);
+		return SectorSize + nextFileHeader->Allocate(freeMap, remainFileSize); /* Record the size of all total headers */
 	}
 
-    return TRUE;
+    return SectorSize; /* 1 header 1 sector */
 }
 
 //----------------------------------------------------------------------
