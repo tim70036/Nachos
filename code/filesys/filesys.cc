@@ -187,8 +187,6 @@ FileSystem::Create(char *pathName, int initialSize, bool isDir)
     /* MP4 */ /* DirectoryFileSize */
     if(isDir)   initialSize = DirectoryFileSize;
 
-    DEBUG(dbgFile, "Creating file " << name << " size " << initialSize);
-
     printf("Creating file, path:  %s, size %d bytes\n",pathName,initialSize);
 
     /* MP4 */
@@ -202,6 +200,7 @@ FileSystem::Create(char *pathName, int initialSize, bool isDir)
 
 
     printf("Find sub-directory, now Creating [%s]\n\n",name);
+    DEBUG(dbgFile, "Creating file " << name << " size " << initialSize);
 
     if (directory->Find(name) != -1)
       success = FALSE;			// file is already in directory
@@ -370,6 +369,16 @@ FileSystem::Remove(char *pathName)
 void
 FileSystem::List(bool recursive, char* listDirectoryPathName)
 {
+    /* MP4 */
+    /* Special case : list root dir */
+    if(strcmp(listDirectoryPathName, "/") == 0)
+    {
+        Directory *directory = new Directory(NumDirEntries);
+        directory->FetchFrom(directoryFile);
+        directory->List(recursive,0);
+        delete directory;
+        return;
+    }
 
     /* MP4 */
     /* Find the directory containing the target dir */
