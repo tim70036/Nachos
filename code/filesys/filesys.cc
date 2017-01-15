@@ -189,6 +189,8 @@ FileSystem::Create(char *name, int initialSize, bool isDir)
 
     DEBUG(dbgFile, "Creating file " << name << " size " << initialSize);
 
+    printf("Creating file %s, size %d bytes\n",name,initialSize);
+
     /* MP4 */
     /* Find the directory containing the target file */
     OpenFile* curDirFile = FindSubDirectory(name);
@@ -196,6 +198,7 @@ FileSystem::Create(char *name, int initialSize, bool isDir)
     Directory *directory = new Directory(NumDirEntries);
     directory->FetchFrom(curDirFile);
 
+    printf("Find sub-directory, back to create\n\n");
 
     if (directory->Find(name) != -1)
       success = FALSE;			// file is already in directory
@@ -397,23 +400,26 @@ FileSystem::Print()
 OpenFile* FileSystem::FindSubDirectory(char* name)
 {
     Directory *curDirectory = new Directory(NumDirEntries);
-    OpenFile* prevDirFile = NULL:
     OpenFile*  curDirFile = directoryFile; /* root file */
     curDirectory->FetchFrom(curDirFile);
 
+    printf("\nStart finding sub-directory\n");
     char* cut = strtok(name, "/");
+
 
     if(cut == NULL)
     {
         delete curDirectory;
         return NULL;
     }
+    printf("The first cut : %s\n", cut);
 
     while(1)
     {
         char *nextCut = strtok(NULL, "/");
         if(nextCut != NULL) /* Go deeper */
         {
+            printf("Next cut exist(%s), go deeper\n", nextCut);
             /* Does sub-directory exist? */
             int sector = curDirectory->Find(cut);
             if(sector == -1)
@@ -424,19 +430,18 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
             }
 
             /* Deeper !!!! */
-            prevDirFile = curDirFile;
             if(curDirFile != directoryFile) delete curDirFile; /* Don;t del root file */
             curDirFile = new OpenFile(sector);
             curDirectory->FetchFrom(curDirFile);
-
+            printf("Change dir to %s\n",cut);
             cut = nextCut;
         }
         /* In the end */
         else
         {
+            printf("Next cut doesn't exist, stop \n");
             delete curDirectory;
-            if(curDirFile != directoryFile) delete curDirFile; /* Don;t del root file */
-            return prevDirFile;
+            return curDirFile;
         }
     }
 }
