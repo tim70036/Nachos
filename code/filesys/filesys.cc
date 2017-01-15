@@ -203,7 +203,6 @@ FileSystem::Create(char *name, int initialSize, bool isDir)
     char* cut = strtok(name, "/");
     for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
     name = cut;
-    if(name == NULL)    return FALSE;
 
     printf("Find sub-directory, back to create\n\n");
 
@@ -281,7 +280,6 @@ FileSystem::Open(char *name)
     char* cut = strtok(name, "/");
     for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
     name = cut;
-    if(name == NULL)    return NULL;
 
 
     DEBUG(dbgFile, "Opening file" << name);
@@ -338,7 +336,6 @@ FileSystem::Remove(char *name)
     char* cut = strtok(name, "/");
     for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
     name = cut;
-    if(name == NULL)    return FALSE;
 
 
     sector = directory->Find(name);
@@ -380,22 +377,38 @@ FileSystem::Remove(char *name)
 //----------------------------------------------------------------------
 
 void
-FileSystem::List(bool recursive, int listDirectoryName)
+FileSystem::List(bool recursive, char* listDirectoryName)
 {
 
     /* MP4 */
-    /* Find the directory containing the target file */
+    /* Find the directory containing the target dir */
     OpenFile* curDirFile = FindSubDirectory(listDirectoryName);
     if(curDirFile == NULL)  return; /* Directory file not found */
     Directory *directory = new Directory(NumDirEntries);
     directory->FetchFrom(curDirFile);
 
-    directory->List(recursive, 0);
+    /* MP4 */
+    /* Cutting path into dir name */
+    char* cut = strtok(listDirectoryName, "/");
+    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
+    listDirectoryName = cut;
+
+
+    /* Find the target dir */
+    int sector = directory->Find(listDirectoryName);
+    if (sector >= 0)
+    {
+        OpenFile* tmpFile = new OpenFile(sector);
+        Directory* tmpDir = new Directory(NumDirEntries);
+        tmpDir->FetchFrom(tmpFile);
+        tmpDir->List(recursive,0);
+        delete tmpDir;
+        delete tmpFile;
+    }
 
     /* MP4 */
     /* Don't delete root directoryFile */
     if(curDirFile != directoryFile && curDirFile != NULL) delete curDirFile;
-
     delete directory;
 }
 
@@ -454,7 +467,7 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
     if(cut == NULL)
     {
         delete curDirectory;
-        return curDirFile; /* path name is '/' */
+        return NULL;
     }
     printf("The first cut : %s\n", cut);
 
