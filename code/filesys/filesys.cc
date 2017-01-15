@@ -222,11 +222,22 @@ FileSystem::Create(char *name, int initialSize, bool isDir)
                 	success = FALSE;	// no space on disk for data
     	    else
             {
-    	    	success = TRUE;
-    		// everthing worked, flush all changes back to disk
+    	    	    success = TRUE;
+    		        // everthing worked, flush all changes back to disk
         	    	hdr->WriteBack(sector);
         	    	directory->WriteBack(curDirFile); /* MP4 */ /* write back to dir */
         	    	freeMap->WriteBack(freeMapFile);
+
+                    /* MP4 */
+                    /* If it's a new dir, need initialize */
+                    // if(isDir)
+                    // {
+                    //     OpenFile* tmpFile = new OpenFile(sector);
+                    //     Directory* tmpDir = new Directory(NumDirEntries);
+                    //     tmpDir->WriteBack(tmpFile);
+                    //     delete tmpDir;
+                    //     delete tmpFile;
+                    // }
 	        }
             delete hdr;
 	    }

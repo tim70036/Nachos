@@ -157,7 +157,8 @@ CreateDirectory(char *name)
 {
     /* MP4 */
     /* Creating Dir is same as creating a file */
-    kernel->fileSystem->Create(name, 0, TRUE);
+    if(kernel->fileSystem->Create(name, 0, TRUE) ==FALSE)
+        printf("Unable to make directory %s\n",name);
 }
 
 //----------------------------------------------------------------------

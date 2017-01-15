@@ -88,11 +88,19 @@ FileHeader::Allocate(PersistentBitmap *freeMap, int fileSize)
     if (freeMap->NumClear() < numSectors)
 	return FALSE;		// not enough space
 
-    for (int i = 0; i < numSectors; i++) {
-	dataSectors[i] = freeMap->FindAndSet();
-	// since we checked that there was enough free space,
-	// we expect this to succeed
-	ASSERT(dataSectors[i] >= 0);
+    for (int i = 0; i < numSectors; i++)
+	{
+		dataSectors[i] = freeMap->FindAndSet();
+		// since we checked that there was enough free space,
+		// we expect this to succeed
+		ASSERT(dataSectors[i] >= 0);
+
+		/* MP4 */
+		/* Clean this sector */
+		char tmp[SectorSize];	for(int i=0 ; i<SectorSize ; i++)	tmp[i] = 0;
+		kernel->synchDisk->WriteSector(dataSectors[i], tmp);
+		
+
     }
 
 	/* MP4 */
