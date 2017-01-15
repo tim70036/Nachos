@@ -198,6 +198,12 @@ FileSystem::Create(char *name, int initialSize, bool isDir)
     Directory *directory = new Directory(NumDirEntries);
     directory->FetchFrom(curDirFile);
 
+    /* MP4 */
+    /* Cutting path into file name */
+    char* cut = strtok(name, "/");
+    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
+    name = cut;
+
     printf("Find sub-directory, back to create\n\n");
 
     if (directory->Find(name) != -1)
@@ -258,6 +264,12 @@ FileSystem::Open(char *name)
     Directory *directory = new Directory(NumDirEntries);
     directory->FetchFrom(curDirFile);
 
+    /* MP4 */
+    /* Cutting path into file name */
+    char* cut = strtok(name, "/");
+    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
+    name = cut;
+
 
     DEBUG(dbgFile, "Opening file" << name);
     sector = directory->Find(name);
@@ -307,6 +319,12 @@ FileSystem::Remove(char *name)
     if(curDirFile == NULL)  return FALSE; /* Directory file not found */
     Directory *directory = new Directory(NumDirEntries);
     directory->FetchFrom(curDirFile);
+
+    /* MP4 */
+    /* Cutting path into file name */
+    char* cut = strtok(name, "/");
+    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
+    name = cut;
 
 
     sector = directory->Find(name);
@@ -404,7 +422,7 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
     curDirectory->FetchFrom(directoryFile);
 
     printf("Current Dir:\n");
-    curDirectory->List(FALSE);
+    curDirectory->List(FALSE, 0);
     printf("\nStart finding sub-directory\n");
     char* cut = strtok(name, "/");
 
@@ -426,6 +444,7 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
             int sector = curDirectory->Find(cut);
             if(sector == -1)
             {
+                printf("Sub-directory %s not found, return NULL\n\n",cut);
                 delete curDirectory;
                 if(curDirFile != directoryFile) delete curDirFile; /* Don;t del root file */
                 return NULL;
@@ -437,7 +456,7 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
             curDirectory->FetchFrom(curDirFile);
             printf("Change dir to %s\n",cut);
             printf("Current Dir:\n");
-            curDirectory->List(FALSE);
+            curDirectory->List(FALSE, 0);
             cut = nextCut;
         }
         /* In the end */
