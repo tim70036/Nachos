@@ -204,7 +204,7 @@ FileSystem::Create(char *name, int initialSize, bool isDir)
     for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
     name = cut;
 
-    printf("Find sub-directory, back to create\n\n");
+    printf("Find sub-directory, now Creating [%s]\n\n",name);
 
     if (directory->Find(name) != -1)
       success = FALSE;			// file is already in directory
@@ -281,6 +281,7 @@ FileSystem::Open(char *name)
     for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
     name = cut;
 
+    printf("Opening File [%s]\n\n",name);
 
     DEBUG(dbgFile, "Opening file" << name);
     sector = directory->Find(name);
@@ -337,6 +338,7 @@ FileSystem::Remove(char *name)
     for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
     name = cut;
 
+    printf("Removing File [%s]\n\n",name);
 
     sector = directory->Find(name);
     // file not found
@@ -393,6 +395,7 @@ FileSystem::List(bool recursive, char* listDirectoryName)
     for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
     listDirectoryName = cut;
 
+    printf("Listing dir [%s]\n\n",listDirectoryName);
 
     /* Find the target dir */
     int sector = directory->Find(listDirectoryName);
@@ -458,9 +461,9 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
     OpenFile*  curDirFile = directoryFile; /* root file */
     curDirectory->FetchFrom(directoryFile);
 
-    printf("Current Dir:\n");
+    //printf("Current Dir:\n");
     curDirectory->List(FALSE, 0);
-    printf("\nStart finding sub-directory\n");
+    //printf("\nStart finding sub-directory\n");
     char* cut = strtok(name, "/");
 
 
@@ -469,14 +472,14 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
         delete curDirectory;
         return NULL;
     }
-    printf("The first cut : %s\n", cut);
+    //printf("The first cut : %s\n", cut);
 
     while(1)
     {
         char *nextCut = strtok(NULL, "/");
         if(nextCut != NULL) /* Go deeper */
         {
-            printf("Next cut exist(%s), go deeper\n", nextCut);
+            //printf("Next cut exist(%s), go deeper\n", nextCut);
             /* Does sub-directory exist? */
             int sector = curDirectory->Find(cut);
             if(sector == -1)
@@ -491,15 +494,15 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
             if(curDirFile != directoryFile) delete curDirFile; /* Don;t del root file */
             curDirFile = new OpenFile(sector);
             curDirectory->FetchFrom(curDirFile);
-            printf("Change dir to %s\n",cut);
-            printf("Current Dir:\n");
+            //printf("Change dir to %s\n",cut);
+            //printf("Current Dir:\n");
             curDirectory->List(FALSE, 0);
             cut = nextCut;
         }
         /* In the end */
         else
         {
-            printf("Next cut doesn't exist, stop \n");
+            //printf("Next cut doesn't exist, stop \n");
             delete curDirectory;
             return curDirFile;
         }
