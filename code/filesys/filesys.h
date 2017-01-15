@@ -85,15 +85,15 @@ class FileSystem {
 	// MP4 mod tag
 	~FileSystem();
 
-    bool Create(char *name, int initialSize, bool isDir); /* MP4 */
+    bool Create(char *pathName, int initialSize, bool isDir); /* MP4 */
 					// Create a file (UNIX creat)
 
-    OpenFile* Open(char *name); 	// Open a file (UNIX open)
+    OpenFile* Open(char *pathName); 	// Open a file (UNIX open)
 
-    bool Remove(char *name);  		// Delete a file (UNIX unlink)
+    bool Remove(char *pathName);  		// Delete a file (UNIX unlink)
 
     /* MP4 */
-    void List(bool recursive, char* listDirectoryName);			
+    void List(bool recursive, char* listDirectoryName);
 
     void Print();			// List all the files and their contents
 

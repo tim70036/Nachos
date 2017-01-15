@@ -177,7 +177,7 @@ FileSystem::~FileSystem()
 //----------------------------------------------------------------------
 
 bool
-FileSystem::Create(char *name, int initialSize, bool isDir)
+FileSystem::Create(char *pathName, int initialSize, bool isDir)
 {
     PersistentBitmap *freeMap;
     FileHeader *hdr;
@@ -189,10 +189,12 @@ FileSystem::Create(char *name, int initialSize, bool isDir)
 
     DEBUG(dbgFile, "Creating file " << name << " size " << initialSize);
 
-    printf("Creating file %s, size %d bytes\n",name,initialSize);
+    printf("Creating file, path:  %s, size %d bytes\n",pathName,initialSize);
 
     /* MP4 */
     /* Find the directory containing the target file */
+    char name[1000];
+    strcpy(name, pathName); /* prevent pathName being modified */
     OpenFile* curDirFile = FindSubDirectory(name); /* name will be cut to file name */
     if(curDirFile == NULL)  return FALSE; /* Directory file not found */
     Directory *directory = new Directory(NumDirEntries);
@@ -258,13 +260,15 @@ FileSystem::Create(char *name, int initialSize, bool isDir)
 //----------------------------------------------------------------------
 
 OpenFile *
-FileSystem::Open(char *name)
+FileSystem::Open(char *pathName)
 {
     OpenFile *openFile = NULL;
     int sector;
 
     /* MP4 */
     /* Find the directory containing the target file */
+    char name[1000];
+    strcpy(name, pathName); /* prevent pathName being modified */
     OpenFile* curDirFile = FindSubDirectory(name);
     if(curDirFile == NULL)  return NULL; /* Directory file not found , return NULL */
     Directory *directory = new Directory(NumDirEntries);
@@ -308,7 +312,7 @@ FileSystem::Open(char *name)
 //----------------------------------------------------------------------
 
 bool
-FileSystem::Remove(char *name)
+FileSystem::Remove(char *pathName)
 {
     PersistentBitmap *freeMap;
     FileHeader *fileHdr;
@@ -316,6 +320,8 @@ FileSystem::Remove(char *name)
 
     /* MP4 */
     /* Find the directory containing the target file */
+    char name[1000];
+    strcpy(name, pathName); /* prevent pathName being modified */
     OpenFile* curDirFile = FindSubDirectory(name);
     if(curDirFile == NULL)  return FALSE; /* Directory file not found */
     Directory *directory = new Directory(NumDirEntries);
@@ -362,11 +368,13 @@ FileSystem::Remove(char *name)
 //----------------------------------------------------------------------
 
 void
-FileSystem::List(bool recursive, char* listDirectoryName)
+FileSystem::List(bool recursive, char* listDirectoryPathName)
 {
 
     /* MP4 */
     /* Find the directory containing the target dir */
+    char listDirectoryName[1000];
+    strcpy(listDirectoryName, listDirectoryPathName); /* prevent pathName being modified */
     OpenFile* curDirFile = FindSubDirectory(listDirectoryName);
     if(curDirFile == NULL)  return; /* Directory file not found */
     Directory *directory = new Directory(NumDirEntries);
@@ -440,8 +448,8 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
     curDirectory->FetchFrom(directoryFile);
 
     //printf("Current Dir:\n");
-    curDirectory->List(FALSE, 0);
-    //printf("\nStart finding sub-directory\n");
+    //curDirectory->List(FALSE, 0);
+    printf("\nStart finding sub-directory\n");
     char* cut = strtok(name, "/");
 
 
