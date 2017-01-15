@@ -200,9 +200,16 @@ FileSystem::Create(char *name, int initialSize, bool isDir)
 
     /* MP4 */
     /* Cutting path into file name */
-    char* cut = strtok(name, "/");
-    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; nextCut = strtok(NULL,"/"))
-        cut = nextCut;
+    char buf[1000];
+    int index = 0;
+    int i =0 ;
+    for(i=strlen(name)-1 ; i>=0 ; i--)
+    {
+        if(name[i] == '/')  break;
+        buf[index++] = name[i];
+    }
+    char cut[index+1];  cut[index] = 0; i = 0;
+    while(--index > 0)  cut[i++] = buf[index];
 
     printf("Find sub-directory, now Creating [%s]\n\n",cut);
 
@@ -277,9 +284,17 @@ FileSystem::Open(char *name)
 
     /* MP4 */
     /* Cutting path into file name */
-    char* cut = strtok(name, "/");
-    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; nextCut = strtok(NULL,"/"))
-        cut = nextCut;
+    char buf[1000];
+    int index = 0;
+    int i =0 ;
+    for(i=strlen(name)-1 ; i>=0 ; i--)
+    {
+        if(name[i] == '/')  break;
+        buf[index++] = name[i];
+    }
+    char cut[index+1];  cut[index] = 0; i = 0;
+    while(--index > 0)  cut[i++] = buf[index];
+
 
     printf("Opening File [%s]\n\n",cut);
 
@@ -334,9 +349,17 @@ FileSystem::Remove(char *name)
 
     /* MP4 */
     /* Cutting path into file name */
-    char* cut = strtok(name, "/");
-    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; nextCut = strtok(NULL,"/"))
-        cut = nextCut;
+    char buf[1000];
+    int index = 0;
+    int i =0 ;
+    for(i=strlen(name)-1 ; i>=0 ; i--)
+    {
+        if(name[i] == '/')  break;
+        buf[index++] = name[i];
+    }
+    char cut[index+1];  cut[index] = 0; i = 0;
+    while(--index > 0)  cut[i++] = buf[index];
+
 
     printf("Removing File [%s]\n\n",cut);
 
@@ -390,9 +413,18 @@ FileSystem::List(bool recursive, char* listDirectoryName)
     directory->FetchFrom(curDirFile);
 
     /* MP4 */
-    /* Cutting path into dir name */
-    char* cut = strtok(listDirectoryName, "/");
-    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
+    /* Cutting path into file name */
+    char buf[1000];
+    int index = 0;
+    int i =0 ;
+    for(i=strlen(name)-1 ; i>=0 ; i--)
+    {
+        if(name[i] == '/')  break;
+        buf[index++] = name[i];
+    }
+    char cut[index+1];  cut[index] = 0; i = 0;
+    while(--index > 0)  cut[i++] = buf[index];
+
 
     printf("Listing dir [%s]\n\n",cut);
 
