@@ -201,19 +201,19 @@ FileSystem::Create(char *name, int initialSize, bool isDir)
     /* MP4 */
     /* Cutting path into file name */
     char* cut = strtok(name, "/");
-    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
-    name = cut;
+    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; nextCut = strtok(NULL,"/"))
+        cut = nextCut;
 
-    printf("Find sub-directory, now Creating [%s]\n\n",name);
+    printf("Find sub-directory, now Creating [%s]\n\n",cut);
 
-    if (directory->Find(name) != -1)
+    if (directory->Find(cut) != -1)
       success = FALSE;			// file is already in directory
     else {
         freeMap = new PersistentBitmap(freeMapFile,NumSectors);
         sector = freeMap->FindAndSet();	// find a sector to hold the file header
     	if (sector == -1)
             success = FALSE;		// no free block for file header
-        else if (!directory->Add(name, sector, isDir)) /* MP4 */ /* isDir */
+        else if (!directory->Add(cut, sector, isDir)) /* MP4 */ /* isDir */
             success = FALSE;	// no space in directory
 	    else
         {
@@ -278,13 +278,13 @@ FileSystem::Open(char *name)
     /* MP4 */
     /* Cutting path into file name */
     char* cut = strtok(name, "/");
-    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
-    name = cut;
+    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; nextCut = strtok(NULL,"/"))
+        cut = nextCut;
 
-    printf("Opening File [%s]\n\n",name);
+    printf("Opening File [%s]\n\n",cut);
 
-    DEBUG(dbgFile, "Opening file" << name);
-    sector = directory->Find(name);
+    DEBUG(dbgFile, "Opening file" << cut);
+    sector = directory->Find(cut);
 
     /* MP4 */
     /* Too much open file? */
@@ -335,12 +335,12 @@ FileSystem::Remove(char *name)
     /* MP4 */
     /* Cutting path into file name */
     char* cut = strtok(name, "/");
-    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
-    name = cut;
+    for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; nextCut = strtok(NULL,"/"))
+        cut = nextCut;
 
-    printf("Removing File [%s]\n\n",name);
+    printf("Removing File [%s]\n\n",cut);
 
-    sector = directory->Find(name);
+    sector = directory->Find(cut);
     // file not found
     if (sector == -1)
     {
@@ -358,7 +358,7 @@ FileSystem::Remove(char *name)
 
     fileHdr->Deallocate(freeMap);  		// remove data blocks
     freeMap->Clear(sector);			// remove header block
-    directory->Remove(name);
+    directory->Remove(cut);
 
     freeMap->WriteBack(freeMapFile);		// flush to disk
     directory->WriteBack(curDirFile); /* MP4 write to curDirFile */
@@ -393,12 +393,11 @@ FileSystem::List(bool recursive, char* listDirectoryName)
     /* Cutting path into dir name */
     char* cut = strtok(listDirectoryName, "/");
     for(char* nextCut = strtok(NULL,"/") ; nextCut != NULL ; cut = nextCut, nextCut = strtok(NULL,"/"));
-    listDirectoryName = cut;
 
-    printf("Listing dir [%s]\n\n",listDirectoryName);
+    printf("Listing dir [%s]\n\n",cut);
 
     /* Find the target dir */
-    int sector = directory->Find(listDirectoryName);
+    int sector = directory->Find(cut);
     if (sector >= 0)
     {
         OpenFile* tmpFile = new OpenFile(sector);
