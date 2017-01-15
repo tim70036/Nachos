@@ -193,34 +193,22 @@ FileSystem::Create(char *name, int initialSize, bool isDir)
 
     /* MP4 */
     /* Find the directory containing the target file */
-    OpenFile* curDirFile = FindSubDirectory(name);
+    OpenFile* curDirFile = FindSubDirectory(name); /* name will be cut to file name */
     if(curDirFile == NULL)  return FALSE; /* Directory file not found */
     Directory *directory = new Directory(NumDirEntries);
     directory->FetchFrom(curDirFile);
 
-    /* MP4 */
-    /* Cutting path into file name */
-    char buf[1000];
-    int index = 0;
-    int i =0 ;
-    for(i=strlen(name)-1 ; i>=0 ; i--)
-    {
-        if(name[i] == '/')  break;
-        buf[index++] = name[i];
-    }
-    char cut[index+1];  cut[index] = 0; i = 0;
-    while(--index > 0)  cut[i++] = buf[index];
 
-    printf("Find sub-directory, now Creating [%s]\n\n",cut);
+    printf("Find sub-directory, now Creating [%s]\n\n",name);
 
-    if (directory->Find(cut) != -1)
+    if (directory->Find(name) != -1)
       success = FALSE;			// file is already in directory
     else {
         freeMap = new PersistentBitmap(freeMapFile,NumSectors);
         sector = freeMap->FindAndSet();	// find a sector to hold the file header
     	if (sector == -1)
             success = FALSE;		// no free block for file header
-        else if (!directory->Add(cut, sector, isDir)) /* MP4 */ /* isDir */
+        else if (!directory->Add(name, sector, isDir)) /* MP4 */ /* isDir */
             success = FALSE;	// no space in directory
 	    else
         {
@@ -282,24 +270,10 @@ FileSystem::Open(char *name)
     Directory *directory = new Directory(NumDirEntries);
     directory->FetchFrom(curDirFile);
 
-    /* MP4 */
-    /* Cutting path into file name */
-    char buf[1000];
-    int index = 0;
-    int i =0 ;
-    for(i=strlen(name)-1 ; i>=0 ; i--)
-    {
-        if(name[i] == '/')  break;
-        buf[index++] = name[i];
-    }
-    char cut[index+1];  cut[index] = 0; i = 0;
-    while(--index > 0)  cut[i++] = buf[index];
+    printf("Opening File [%s]\n\n",name);
 
-
-    printf("Opening File [%s]\n\n",cut);
-
-    DEBUG(dbgFile, "Opening file" << cut);
-    sector = directory->Find(cut);
+    DEBUG(dbgFile, "Opening file" << name);
+    sector = directory->Find(name);
 
     /* MP4 */
     /* Too much open file? */
@@ -347,23 +321,9 @@ FileSystem::Remove(char *name)
     Directory *directory = new Directory(NumDirEntries);
     directory->FetchFrom(curDirFile);
 
-    /* MP4 */
-    /* Cutting path into file name */
-    char buf[1000];
-    int index = 0;
-    int i =0 ;
-    for(i=strlen(name)-1 ; i>=0 ; i--)
-    {
-        if(name[i] == '/')  break;
-        buf[index++] = name[i];
-    }
-    char cut[index+1];  cut[index] = 0; i = 0;
-    while(--index > 0)  cut[i++] = buf[index];
+    printf("Removing File [%s]\n\n",name);
 
-
-    printf("Removing File [%s]\n\n",cut);
-
-    sector = directory->Find(cut);
+    sector = directory->Find(name);
     // file not found
     if (sector == -1)
     {
@@ -381,7 +341,7 @@ FileSystem::Remove(char *name)
 
     fileHdr->Deallocate(freeMap);  		// remove data blocks
     freeMap->Clear(sector);			// remove header block
-    directory->Remove(cut);
+    directory->Remove(name);
 
     freeMap->WriteBack(freeMapFile);		// flush to disk
     directory->WriteBack(curDirFile); /* MP4 write to curDirFile */
@@ -412,24 +372,11 @@ FileSystem::List(bool recursive, char* listDirectoryName)
     Directory *directory = new Directory(NumDirEntries);
     directory->FetchFrom(curDirFile);
 
-    /* MP4 */
-    /* Cutting path into file name */
-    char buf[1000];
-    int index = 0;
-    int i =0 ;
-    for(i=strlen(name)-1 ; i>=0 ; i--)
-    {
-        if(name[i] == '/')  break;
-        buf[index++] = name[i];
-    }
-    char cut[index+1];  cut[index] = 0; i = 0;
-    while(--index > 0)  cut[i++] = buf[index];
 
-
-    printf("Listing dir [%s]\n\n",cut);
+    printf("Listing dir [%s]\n\n",listDirectoryName);
 
     /* Find the target dir */
-    int sector = directory->Find(cut);
+    int sector = directory->Find(listDirectoryName);
     if (sector >= 0)
     {
         OpenFile* tmpFile = new OpenFile(sector);
@@ -525,15 +472,16 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
             if(curDirFile != directoryFile) delete curDirFile; /* Don;t del root file */
             curDirFile = new OpenFile(sector);
             curDirectory->FetchFrom(curDirFile);
-            //printf("Change dir to %s\n",cut);
+            printf("Change dir to %s\n",cut);
             //printf("Current Dir:\n");
-            curDirectory->List(FALSE, 0);
+            //curDirectory->List(FALSE, 0);
             cut = nextCut;
         }
         /* In the end */
         else
         {
             //printf("Next cut doesn't exist, stop \n");
+            strcpy(name,cut); /* name will be modified to file name */
             delete curDirectory;
             return curDirFile;
         }
