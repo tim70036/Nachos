@@ -311,7 +311,7 @@ FileSystem::Open(char *pathName)
 //----------------------------------------------------------------------
 
 bool
-FileSystem::Remove(char *pathName)
+FileSystem::Remove(bool recursive, char *pathName)
 {
     PersistentBitmap *freeMap;
     FileHeader *fileHdr;
@@ -339,6 +339,36 @@ FileSystem::Remove(char *pathName)
         delete directory;
         return FALSE;
     }
+
+    /* MP4 */
+    /* Recursively remove , only if this file is a dir */
+    if(directory->isDir(name) && recursive)
+    {
+        /* Read out the target dir */
+        OpenFile* tarOpenFile = new OpenFile(sector);
+        Directory* tarDirectory = new Directory(NumDirEntries);
+        tarDirectory->FetchFrom(tarOpenFile);
+
+        /* Creating Target's Path Name */
+        char tarPathName[1000];
+        strcpy(tarPathName, pathName); /* pathName: /a/b/c */
+        int offset = strlen(tarPathName);
+        tarPathName[offset] = '/'; /* tarPathName : /a/b/c/ */
+
+        /* Remove all things in the target directory */
+        for(int i=0 ; i<tarDirectory->tableSize ; i++)
+        {
+            if(tarDirectory->table[i].inUse)
+            {
+                strcpy(tarPathName+offset+1, table[i].name); /* Append the file name */
+                Remove(TRUE, tarPathName);
+            }
+        }
+
+        delete tarOpenFile;
+        delete tarDirectory;
+    }
+
     fileHdr = new FileHeader;
     fileHdr->FetchFrom(sector);
 

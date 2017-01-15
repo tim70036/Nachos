@@ -68,6 +68,9 @@ class Directory {
     /* MP4 */ /* overload */
     bool Add(char *name, int newSector, bool isDir);
 
+    /* MP4 */
+    bool isDir(char* name);
+
     bool Remove(char *name);		// Remove a file from the directory
 
     /* MP4 */ /* support recursive */
@@ -78,6 +81,14 @@ class Directory {
 					//  of the directory -- all the file
 					//  names and their contents.
 
+    int tableSize;			// Number of directory entries
+
+
+    int FindIndex(char *name);		// Find the index into the directory
+					//  table corresponding to "name"
+
+    DirectoryEntry *table;		// Table of pairs:
+					// <file name, file header location>
   private:
 
 	/*
@@ -87,12 +98,7 @@ class Directory {
 		In-core part: tableSize
 	*/
 
-    int tableSize;			// Number of directory entries
-    DirectoryEntry *table;		// Table of pairs:
-					// <file name, file header location>
 
-    int FindIndex(char *name);		// Find the index into the directory
-					//  table corresponding to "name"
 };
 
 #endif // DIRECTORY_H

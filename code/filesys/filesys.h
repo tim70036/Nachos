@@ -90,7 +90,7 @@ class FileSystem {
 
     OpenFile* Open(char *pathName); 	// Open a file (UNIX open)
 
-    bool Remove(char *pathName);  		// Delete a file (UNIX unlink)
+    bool Remove(bool recursive, char *pathName);  		// Delete a file (UNIX unlink)
 
     /* MP4 */
     void List(bool recursive, char* listDirectoryName);

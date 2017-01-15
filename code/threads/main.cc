@@ -312,7 +312,9 @@ main(int argc, char **argv)
 
 #ifndef FILESYS_STUB
     if (removeFileName != NULL) {
-		kernel->fileSystem->Remove(removeFileName);
+        /* MP4 */
+        /* Support recursive Remove */
+		kernel->fileSystem->Remove(recursiveRemoveFlag, removeFileName);
     }
     if (copyUnixFileName != NULL && copyNachosFileName != NULL) {
 		Copy(copyUnixFileName,copyNachosFileName);

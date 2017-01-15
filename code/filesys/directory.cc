@@ -250,3 +250,13 @@ Directory::Print()
     printf("\n");
     delete hdr;
 }
+
+/* MP4 */
+/* Used for recursive remove */
+bool Directory::isDir(char* name)
+{
+    int i = FindIndex(name);
+
+    if (i == -1)    return FALSE; 		// name not in directory
+    return table[i].isDir;
+}
