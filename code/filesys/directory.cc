@@ -202,13 +202,13 @@ Directory::List(bool recursive, int depth)
         /* Better format , support recursive list*/
         if (table[i].inUse)
   	    {
-            for(int j = 0 ; j < depth ; j++)    printf(">__< >__< >__<");
+            for(int j = 0 ; j < depth ; j++)    printf("    ");
 
             printf("<%d>    ",num);
             printf("%s  ", table[i].name);
             if(table[i].isDir)
             {
-                printf("(dir)\n");
+                printf("(dir) (sector %d)\n",table[i].sector);
 
                 /* List recursively */
                 if(recursive)
@@ -223,7 +223,7 @@ Directory::List(bool recursive, int depth)
                     delete subDir;
                 }
             }
-            else printf("(file)\n");
+            else printf("(file) (sector %d)\n",table[i].sector);
             num++;
         }
     }

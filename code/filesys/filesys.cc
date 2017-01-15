@@ -401,8 +401,10 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
 {
     Directory *curDirectory = new Directory(NumDirEntries);
     OpenFile*  curDirFile = directoryFile; /* root file */
-    curDirectory->FetchFrom(curDirFile);
+    curDirectory->FetchFrom(directoryFile);
 
+    printf("Current Dir:\n");
+    curDirectory->List(FALSE);
     printf("\nStart finding sub-directory\n");
     char* cut = strtok(name, "/");
 
@@ -434,6 +436,8 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
             curDirFile = new OpenFile(sector);
             curDirectory->FetchFrom(curDirFile);
             printf("Change dir to %s\n",cut);
+            printf("Current Dir:\n");
+            curDirectory->List(FALSE);
             cut = nextCut;
         }
         /* In the end */
