@@ -458,7 +458,7 @@ OpenFile* FileSystem::FindSubDirectory(char* name)
 
     //printf("Current Dir:\n");
     //curDirectory->List(FALSE, 0);
-    printf("\nStart finding sub-directory\n");
+    //printf("\nStart finding sub-directory\n");
     char* cut = strtok(name, "/");
 
 
