@@ -187,7 +187,7 @@ FileSystem::Create(char *pathName, int initialSize, bool isDir)
     /* MP4 */ /* DirectoryFileSize */
     if(isDir)   initialSize = DirectoryFileSize;
 
-    printf("Creating file, path:  %s, size %d bytes\n",pathName,initialSize);
+    printf("Creating file path [%s]   size [%d bytes] \n",pathName,initialSize);
 
     /* MP4 */
     /* Find the directory containing the target file */
@@ -360,7 +360,7 @@ FileSystem::Remove(bool recursive, char *pathName)
         {
             if(tarDirectory->table[i].inUse)
             {
-                strcpy(tarPathName+offset+1, table[i].name); /* Append the file name */
+                strcpy(tarPathName+offset+1, tarDirectory->table[i].name); /* Append the file name */
                 Remove(TRUE, tarPathName);
             }
         }
@@ -403,6 +403,7 @@ FileSystem::List(bool recursive, char* listDirectoryPathName)
     /* Special case : list root dir */
     if(strcmp(listDirectoryPathName, "/") == 0)
     {
+        printf("Listing dir [/]...\n\n");
         Directory *directory = new Directory(NumDirEntries);
         directory->FetchFrom(directoryFile);
         directory->List(recursive,0);
@@ -420,7 +421,7 @@ FileSystem::List(bool recursive, char* listDirectoryPathName)
     directory->FetchFrom(curDirFile);
 
 
-    printf("Listing dir [%s]\n\n",listDirectoryName);
+    printf("Listing dir [%s]...\n\n",listDirectoryName);
 
     /* Find the target dir */
     int sector = directory->Find(listDirectoryName);
