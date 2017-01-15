@@ -199,7 +199,8 @@ FileSystem::Create(char *pathName, int initialSize, bool isDir)
     directory->FetchFrom(curDirFile);
 
 
-    printf("Find sub-directory, now Creating [%s]\n\n",name);
+    printf("Find desired directory.\n");
+    printf("Start creating [%s]\n\n",name);
     DEBUG(dbgFile, "Creating file " << name << " size " << initialSize);
 
     if (directory->Find(name) != -1)
