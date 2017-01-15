@@ -200,7 +200,7 @@ FileSystem::Create(char *pathName, int initialSize, bool isDir)
 
 
     printf("Find desired directory.\n");
-    printf("Start creating [%s]\n\n",name);
+    printf("Start creating [%s]\n",name);
     DEBUG(dbgFile, "Creating file " << name << " size " << initialSize);
 
     if (directory->Find(name) != -1)
@@ -225,7 +225,7 @@ FileSystem::Create(char *pathName, int initialSize, bool isDir)
     	    else
             {
                     /* Output the totalSize */
-                    printf("Successfully allocated, total headers' size [%d bytes]\n",totalSize);
+                    printf("Successfully allocated, total headers' size [%d bytes]\n\n",totalSize);
 
                     success = TRUE;
     		        // everthing worked, flush all changes back to disk
@@ -412,7 +412,7 @@ FileSystem::List(bool recursive, char* listDirectoryPathName)
     /* Special case : list root dir */
     if(strcmp(listDirectoryPathName, "/") == 0)
     {
-        printf("Listing dir [/]...\n\n");
+        printf("Listing dir [/]...\n");
         Directory *directory = new Directory(NumDirEntries);
         directory->FetchFrom(directoryFile);
         directory->List(recursive,0);
@@ -430,7 +430,7 @@ FileSystem::List(bool recursive, char* listDirectoryPathName)
     directory->FetchFrom(curDirFile);
 
 
-    printf("Listing dir [%s]...\n\n",listDirectoryName);
+    printf("Listing dir [%s]...\n",listDirectoryName);
 
     /* Find the target dir */
     int sector = directory->Find(listDirectoryName);
